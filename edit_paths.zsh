@@ -1,3 +1,20 @@
+# The following functions append/prepend the specified directory to the path variable specified by name
+# If the directory is already in the path, it is first removed and then appended/prepended.
+# Examples:
+#
+# Prepend `~/bin` to `$PATH`:
+#   prepend_path PATH ~/bin
+#
+# Append `~bin` to `$PATH` instead:
+#  append_path PATH ~/bin
+# (this will remove `~/bin` from the beginning of `$PATH` first)
+#
+# Append `~/lib/python-2.7/site-packages` to `$PYTHONPATH`:
+#  append_path PYTHONPATH ~/lib/python-2.7/site-packages
+#
+# and so on ...
+
+
 # Remove $1 from path $2, e.g.
 #   remove_from_path PATH ~/bin
 #   remove_from_path PYTHONPATH ~/lib/python2.7/site-packages
