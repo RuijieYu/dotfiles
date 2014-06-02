@@ -15,7 +15,7 @@
 # and so on ...
 
 
-# Remove $1 from path $2, e.g.
+# Remove $2 from path with name $1, e.g.
 #   remove_from_path PATH ~/bin
 #   remove_from_path PYTHONPATH ~/lib/python2.7/site-packages
 function remove_from_path() {
