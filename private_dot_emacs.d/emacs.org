@@ -8,6 +8,8 @@
 #+property: header-args:emacs-lisp+ :results none
 
 * Preface
+
+** Set up =init.el=
 Making the configuration as a package fails -- too many errors occur
 during compilation and on load. Hence here is my second attempt, now
 to make a literate configuration using org-mode.
@@ -21,7 +23,7 @@ SO, but unfortunately I do not recall where the snippets originated.
 The following code block is for ="init.el"=, instructing =emacs= to
 tangle and compile if necessary.
 #+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-;;; init.el --- Configuration -*- no-byte-compile: t -*-
+;;; -*- no-byte-compile: t -*-
 ;;; do not compile init.el
 
 ;; default dir at config folder
@@ -30,18 +32,24 @@ tangle and compile if necessary.
 ;; load the newer, not always .elc
 (setq load-prefer-newer t)
 
-(defvar cfg-init--count 0
-  "Counter for \"init.el\" to avoid recursive loading.")
-(setq cfg-init--count (1+ cfg-init--count))
-
 ;; redirect custom file so that customizations do not clutter
 ;; configuration file
-(setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file
-	nil				; noerror
-	nil				; nomessage
-	:nosuffix))
+(eval-and-compile
+  (defconst defcustom-file
+    (expand-file-name "~/.emacs.d/defcustom.el"))
+  (when (file-exists-p defcustom-file)
+    (load defcustom-file
+          nil
+          nil
+          :nosuffix))
+  
+  (setq custom-file (expand-file-name "~/.emacs.d/custom.el"))
+  (when (file-exists-p custom-file)
+    (load custom-file
+	  nil				; noerror
+	  nil				; nomessage
+	  :nosuffix))
+  )
 
 ;; check if need to tangle: emacs.org is newer than either *.el file
 ;; WARNING: this snippet *does not* reload "init.el" after a
@@ -55,10 +63,12 @@ tangle and compile if necessary.
   (when (or (file-newer-than-file-p this init)
 	    (file-newer-than-file-p this config))
     (require 'ob-tangle)
+    (declare-function org-babel-tangle-file load-file-name)
     (org-babel-tangle-file this))
 
   ;; now that the files are re-tangled, try to re-compile and load
   ;; them
+  (require 'bytecomp)
   (dolist (file (list init config))
     (byte-recompile-file
      file
@@ -69,12 +79,24 @@ tangle and compile if necessary.
   )
 #+end_src
 
+** All custom variables
+It seems that custom variables need to be declared first before being
+able to be updated by =custom.el=, so here is a new file named
+=defcustom.el= specifically for declaring the custom files. All
+=defcustom= still belongs to their corresponding sections, but need to
+be placed on a separate source block and redirect the tangle file to
+=defcustom.el=.
+#+begin_src emacs-lisp :tangle ~/.emacs.d/defcustom.el
+;; -*- no-byte-compile: t -*-
+#+end_src
+
+
 * Enlarging GC
 First, the garbage collection limit needs to raise a lot when =emacs=
-starts up.
+starts up. NOTE: this raises the GC limit to *4GiB*.
 #+begin_src emacs-lisp
-(setq gc-cons-percentage
-      (* 512 1024 1024))
+(setq gc-cons-threshold
+      (* 4 1024 1024 1024))
 (add-hook
  'emacs-startup-hook
  (lambda ()
@@ -88,28 +110,39 @@ starts up.
 #+end_src
 
 * Package Management
+:properties:
+
+:end:
 Currently I am using =package.el= with =use-package=, but I may take a look at
 =straight.el= in the future when I don't need to stress on schoolwork as much.
+
+Reference: [[https://emacs.stackexchange.com/a/50603]]
 
 First make sure melpa is available, which hosts most packages that I need.
 #+begin_src emacs-lisp
 (require 'package)
-(push '("melpa" . "https://melpa.org/packages/")
-      package-archives)
+(eval-and-compile
+  (add-to-list 'package-archives
+               '("melpa" . "https://melpa.org/packages/")))
 #+end_src
 
-Then initialize package database.
+Then initialize package database. Force refresh contents during compilation.
 #+begin_src emacs-lisp
-(package-initialize)
-(unless package-archive-contents
+(eval-when-compile
+  (package-initialize)
   (package-refresh-contents))
 #+end_src
 
-Then make sure =use-package= is installed. The function =use-package= should be
-autoloaded.
+Then make sure =use-package= is installed.
 #+begin_src emacs-lisp
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
+(eval-and-compile
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  ;; not sure why, but this is only needed during byte compilation
+  (require 'use-package)
+  (require 'bind-key)
+  )
 #+end_src
 
 * Keybind Setup
@@ -117,9 +150,14 @@ I use a combination of =general.el=, =hydra= and =:bind= from =use-package= to c
 keybinds. I /might/ make them uniform in the future but not now.
 
 ** Personal Keybindings
-It appears that for some reason the variable =personal-keybindings= needs to be defined.
+It appears that for some reason the variable =personal-keybindings=
+needs to be defined. For now, I assume =use-package= uses =bind-key= to
+add keybindings.
+
 #+begin_src emacs-lisp
-(require 'bind-key)
+(use-package bind-key
+  :ensure t
+  )
 #+end_src
 
 ** Initializing =general.el=
@@ -150,6 +188,13 @@ keybinds. They could either be expanded, or be replaced completely.
 (use-package hydra
   ;; just make sure the package is installed
   :ensure t
+  :config
+  (declare-function hydra--call-interactively-remap-maybe load-file-name)
+  (declare-function hydra-default-pre load-file-name)
+  (declare-function hydra-keyboard-quit load-file-name)
+  (declare-function hydra-set-transient-map load-file-name)
+  (declare-function hydra-show-hint load-file-name)
+  (declare-function hydra-timeout load-file-name)
   )
 #+end_src
 
@@ -284,15 +329,13 @@ Hide certain minor modes from modeline.
 
 ** Dired with Icons
 #+begin_src emacs-lisp
-(with-eval-after-load 'cfg-enable-gui
-  (use-package all-the-icons-dired
-    :ensure t
-    :if (display-graphic-p)
-    :requires all-the-icons
-    :hook
-    (dired-mode . (lambda () (when (display-graphic-p)
-			       (all-the-icons-dired-mode))))
-    )
+(use-package all-the-icons-dired
+  :ensure t
+  :if (display-graphic-p)
+  :requires all-the-icons
+  :hook
+  (dired-mode . (lambda () (when (display-graphic-p)
+			     (all-the-icons-dired-mode))))
   )
 #+end_src
 
@@ -316,6 +359,7 @@ Hide certain minor modes from modeline.
 #+begin_src emacs-lisp
 (use-package jupyter
   :ensure t
+  :if (executable-find "jupyter")
   :after (org
 	  python)
   :custom
@@ -329,7 +373,7 @@ Hide certain minor modes from modeline.
   :config
   (dolist (lang '((python . t)
 		  (jupyter . t)))
-    (push lang org-babel-load-languages))
+    (add-to-list 'org-babel-load-languages lang))
   (org-babel-do-load-languages
    'org-babel-load-languages
    org-babel-load-languages)
@@ -349,6 +393,7 @@ Hide certain minor modes from modeline.
 * Org
 Orgmode configurations.
 #+begin_src emacs-lisp
+;; (declare-function org-insert-structure-template load-file-name)
 (use-package org
   :ensure t
   :diminish
@@ -362,6 +407,7 @@ Orgmode configurations.
   ;; (org-mode . visual-line-mode)
   (org-mode . ispell-minor-mode)
   (org-mode . org-indent-mode)
+  ;; :functions org-insert-structure-template
   :bind
   (:map org-mode-map
 	("<C-->" . #'org-insert-structure-template)
@@ -379,6 +425,7 @@ Orgmode configurations.
   (org-cycle-separator-lines 2)
 
   :config
+  (declare-function org-insert-structure-template load-file-name)
   ;; show bullet points as unicode
   (font-lock-add-keywords
    'org-mode
@@ -450,27 +497,27 @@ Orgmode configurations.
 #+end_src
 
 * CPP
-#+begin_src emacs-lisp
-(defcustom cfg-cpp--clang-format-path
-  "/usr/share/clang"
+#+begin_src emacs-lisp :tangle ~/.emacs.d/defcustom.el
+(defcustom cfg-path--clang-format
+  (expand-file-name "~/.emacs.d/clang-format")
   "The path to the *.el files for clang-format."
   :type 'directory
   :group 'custom
   )
+#+end_src
 
-;; can't find a way to disable undefined functions warning
-(push cfg-cpp--clang-format-path load-path)
-
-;; (declare-function clang-format load-file-name)
-;; (declare-function clang-format-buffer load-file-name)
-;; (declare-function clang-format-buffer load-file-name)
+#+begin_src emacs-lisp
+(eval-and-compile
+  ;; can't find a way to disable undefined functions warning
+  (push cfg-path--clang-format load-path)
+  )
 
 (use-package clang-format
   :ensure nil ; provided by arch "clang"
-  :load-path "/opt/homebrew/Cellar/clang-format/13.0.0/share/clang/"
-  ;; :functions (clang-format
-  ;; 	      clang-format-buffer
-  ;; 	      clang-format-region)
+  :if (file-exists-p cfg-path--clang-format)
+  :functions (clang-format
+              clang-format-buffer
+              clang-format-region)
   :bind
   ("<C-c>fb" . #'clang-format-buffer)
   ("<C-c>ff" . #'clang-format)
@@ -493,6 +540,13 @@ Orgmode configurations.
   :custom
   (explicit-shell-file-name "zsh")
   (explicit-zsh-args nil)
+  :functions (term-check-proc
+              term-mode
+              term-exec
+              term-char-mode
+              cfg-term--buffer-usable
+              cfg-term--next
+              cfg-term--make)
   :config
   (defun cfg-term--buffer-usable (buffer-or-name)
     ;; a buffer is usable if any of these are true:
@@ -568,11 +622,12 @@ use in that buffer.  Also see `term' and `make-term'."
 #+begin_src emacs-lisp
 (use-package vterm
   :ensure t
+  :if (executable-find "cmake")
   :commands vterm
   :custom
   (vterm-shell "zsh")
   (vterm-max-scrollback 10000)
-)
+  )
 #+end_src
 
 ** eshell
@@ -745,6 +800,7 @@ frame). Similar to qutebrowser's =f= key.
   :diminish yas-minor-mode
   :hook (prog-mode . yas-minor-mode)
   :config
+  (declare-function yas-reload-all load-file-name)
   (yas-reload-all)
   )
 #+end_src
@@ -779,6 +835,7 @@ Disable mouse on GUI.
 (use-package disable-mouse
   :ensure t
   :config
+  (declare-function global-disable-mouse-mode load-file-name)
   (global-disable-mouse-mode)
   )
 #+end_src
@@ -821,7 +878,7 @@ Use =flycheck= for file linting.
   :ensure t
   :after flycheck
   :hook
-  (flycheck-mode . flycheck-pycheckers)                 
+  (flycheck-mode . flycheck-pycheckers-setup)
   )
 #+end_src
 
@@ -888,7 +945,7 @@ tty, but tty can't have color inversion anyways so things should be fine.
 
 ** UI Minimization
 A few tweaks to minimize the UI.
-#+begin_export emacs-lisp
+#+begin_src emacs-lisp
 (setq
  inhibit-startup-message t		; thanks but see you no more
  mouse-wheel-scroll-amount '(1 ((shift) . 1)) ; scroll one line each time
@@ -908,13 +965,20 @@ A few tweaks to minimize the UI.
 (add-hook 'makefile-mode-hook
 	  (lambda () (setq-local indent-tabs-mode 'only)))
 
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(tooltip-mode -1) ; show tooltip in minibuffer instead of pop-up window
-(menu-bar-mode -1)
-(column-number-mode 1)
+(defun cfg-ui-minimize ()
+  "Minimize the UI."
+  (interactive)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1) ; show tooltip in minibuffer instead of pop-up window
+  (menu-bar-mode -1)
+  (column-number-mode 1)
+  )
+
+(cfg-ui-minimize)
+
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-#+end_export
+#+end_src
 
 ** Text Scaling
 This section uses =hydra= to scale text.
@@ -980,11 +1044,24 @@ processes try to launch an editor to just use the existing frame / window.
 #+end_src
 
 ** llvm
+#+begin_src emacs-lisp :tangle ~/.emacs.d/defcustom.el
+(defcustom cfg-path--llvm-mode
+  (expand-file-name "~/.emacs.d/llvm-mode")
+  "Path to LLVM-mode files."
+  :type 'directory
+  :group 'custom
+  )
+#+end_src
+
 #+begin_src emacs-lisp
+(eval-and-compile
+  (push cfg-path--llvm-mode load-path)
+  )
+
 (use-package llvm-mode
   ;; installed in AUR as emacs-llvm-mode
   :ensure nil
-  :load-path "/usr/share/emacs/site-lisp/emacs-llvm-mode"
+  :if (file-exists-p cfg-path--llvm-mode)
   :mode
   ("\\.ll\\'" . llvm-mode)
   )
