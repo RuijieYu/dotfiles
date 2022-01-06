@@ -2,10 +2,9 @@
 local -r ZSHRC_DIR="$HOME/.config/zsh"
 local -r ZSHRC="$ZSHRC_DIR/.zshrc"
 local -r ZSHRC_CONFIG="$ZSHRC_DIR/config"
-# go inside directories first
-__FIND_ARGS=(-depth)
-for file in $(find "$ZSHRC_CONFIG/" \
-		   "${__FIND_ARGS[@]}" \
+for file in $(find -L \
+                   "$ZSHRC_CONFIG/" \
+		   -depth \
 		   -type f \
 		   -name \*.zsh | sort); do
     # not using -readable because it is not portable
