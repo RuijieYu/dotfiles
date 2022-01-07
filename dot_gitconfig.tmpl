@@ -1,0 +1,70 @@
+[user]
+	email = {{ .git_email }}
+	name = {{ .name }}
+[init]
+	defaultBranch = main
+
+[alias]
+	## log related
+        lg = "!f(){ __git_lg_level=\"${1-}\";(($#>1))&&shift;git lg-specific \"$__git_lg_level\" --all \"$@\";unset __git_lg_level;};f"
+	lg1 = lg 1
+	lg2 = lg 2
+	lg3 = lg 3
+
+	lg-specific = "!f(){ n=${1:-1}; if [ \"$#\" -gt 0 ]; then shift; fi; git lg\"$n\"-specific \"$@\";};f"
+	lgad = log --graph --abbrev-commit --decorate
+	lg1-specific = lgad --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an "%C(#800080 ul)"[%G?]%C(reset)%C(auto)%d%C(reset)'
+	lg2-specific = lgad --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an "%C(#800080 ul)"[%G?]%C(reset)'
+	lg3-specific = lgad --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> "%C(#800080 ul)"[%G?]%C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'
+
+	l = log --format="%C(yellow)%h\\ %ad%Cred%d%Creset\\ %C(#aaaaaa)%s%Creset\\ %C(cyan)[%aN]%Creset\\ %C(#800080\\ ul){GPG=%G?}%Creset" --decorate=short --date=short
+
+	## status related
+	# short status
+	s = status -s
+	sf = status -su
+
+	## clone related
+	rclone = clone -j8 --recurse-submodules
+
+	## branch related
+	# list branches sorted by last modified
+	b = "!git for-each-ref \
+                  --sort=-authordate \
+                  --format='%(authordate)%09%(objectname:short)%09%(refname)' \
+                  refs/heads | \
+                  sed -e 's-refs/heads/--'"
+
+	## alias related
+	# list aliases
+	la = "!git config -l | grep alias | cut -c7- | grep -P '^[\\w]+(?==)'"
+
+	# debug an alias
+	debug = \
+		"!set -x;\
+		GIT_TRACE=2 \
+			GIT_CURL_VERBOSE=2 \
+			GIT_TRACE_PERFORMANCE=2 \
+			GIT_TRACE_PACK_ACCESS=2 \
+			GIT_TRACE_PACKET=2 \
+			GIT_TRACE_PACKFILE=2 \
+			GIT_TRACE_SETUP=2 \
+			GIT_TRACE_SHALLOW=2 \
+			git"
+
+	tm = tag -sam
+	resign = commit --amend -S -C@
+
+        tty = !gpg-connect-agent updatestartuptty /bye
+	root = !pwd
+
+	sn = show --name-only
+
+    # obtain the hash for remote git HEAD
+    remote-hash = "!f(){ git ls-remote 2>/dev/null|grep HEAD|awk \"{print \\$1}\";};f"
+
+    # obtain the hash for local git HEAD; optionally specify a commit-ish object
+    local-hash = log -1 --format=%H
+
+    # (interactive) rebase without using an actual editor
+    trivial-rebase = "!f(){ GIT_EDITOR=: git rebase \"$@\";};GIT_EDITOR=: f"
