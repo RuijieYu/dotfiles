@@ -68,3 +68,5 @@
 
     # (interactive) rebase without using an actual editor
     trivial-rebase = "!f(){ GIT_EDITOR=: git rebase \"$@\";};GIT_EDITOR=: f"
+[advice]
+	skippedCherryPicks = false
