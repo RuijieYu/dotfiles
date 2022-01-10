@@ -1,0 +1,4 @@
+alias sudoedit find-file /sudo::$1
+alias emacs-r find-file-read-only $1
+alias emacs find-file $1
+alias clear clear 1
