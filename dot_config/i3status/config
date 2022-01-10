@@ -8,7 +8,7 @@
 
 general {
   colors = true
-  interval = 5
+  interval = 1
 }
 
 # order += "ipv6"
@@ -18,8 +18,14 @@ order += "battery all"
 order += "disk /"
 order += "load"
 order += "memory"
+order += "volume master"
 order += "cpu_temperatore 0"
 order += "tztime local"
+
+volume master {
+  format = "♪%volume%%"
+  format_muted = "🔇"
+}
 
 wireless _first_ {
   format_up = "W=%ip"
