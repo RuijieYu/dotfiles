@@ -140,10 +140,13 @@ config.set('content.javascript.enabled', True, 'qute://*/*')
 
 # set search engines, using shipped default of duckduckgo
 config.get('url.searchengines').update({
+    # arch
     'arch': 'https://wiki.archlinux.org/?search={}',
     'arch=': 'https://wiki.archlinux.org/title/{}',
     'aur': 'https://aur.archlinux.org/packages/?K={}',
     'aur=': 'https://aur.archlinux.org/packages/{}',
+    # dictionary
+    'mw': 'https://www.merriam-webster.com/dictionary/{}',
 })
 
 # tabs are windows
@@ -153,12 +156,13 @@ config.set('tabs.tabs_are_windows', True)
 # that emacs starts the server under $XDG_RUNTIME_DIR. This envvar has
 # an unusual default value of ~/.local/run which (as far as I can
 # tell) is the default of no distros.
+from os import environ as env
+
 def _emacsclient_command():
     'Return the command line arguments used for invoking `emacsclient`.'
     from pathlib import Path
-    import os
     from typing import Optional
-    xdg_runtime_dir = Path(os.environ['XDG_RUNTIME_DIR'] or
+    xdg_runtime_dir = Path(env.get('XDG_RUNTIME_DIR') or
                            '~/.local/run').expanduser()
     emacs_daemon_dir = xdg_runtime_dir / 'emacs'
 
@@ -187,3 +191,30 @@ def _emacsclient_command():
 
 config.set('editor.command',
            _emacsclient_command())
+
+# get userscript qute-pass to work
+_wl_dmenu, _x_dmenu = 'bemenu', 'dmenu' # default for wayland / x11
+                                        # dmenu alternatives
+def _get_dmenu():
+    return (_wl_dmenu if env.get('WAYLAND_DISPLAY')
+            else _x_dmenu)
+def _qute_pass(arg='', *, dmenu=None):
+    dmenu = dmenu or _get_dmenu()
+
+    env.setdefault('PASSWORD_STORE_DIR',
+                   (f'{env["HOME"]}/'
+                    '.local/share/'
+                    'pass/password-store'))
+
+    return ('spawn --userscript qute-pass '
+            f'-d "{dmenu}" '
+            f'-p "{env["PASSWORD_STORE_DIR"]}" '
+            f'{arg}')
+
+for mode in ('normal', 'insert', 'prompt'):
+    config.bind('<Ctrl-Return>', _qute_pass(), mode=mode)
+    # only bind the following when not in normal mode
+    if mode == 'normal': continue
+    config.bind('<Ctrl-U>', _qute_pass('--username-only'), mode=mode)
+    config.bind('<Ctrl-P>', _qute_pass('--password-only'), mode=mode)
+    config.bind('<Ctrl-O>', _qute_pass('--otp-only'), mode=mode)
