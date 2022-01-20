@@ -526,6 +526,31 @@ Orgmode configurations.
   )
 #+end_src
 
+* Text Modes
+Some helpful packages and keybindings useful in pure text contexts.
+
+** Auto Visual-Line for Text Files
+#+begin_src emacs-lisp
+(use-package text-mode
+  :ensure nil
+  :hook (text-mode . visual-line-mode)
+  )
+#+end_src
+
+** Unfill Text
+Unfill a text region when under visual line mode
+#+begin_src emacs-lisp
+(use-package unfill
+  :ensure t
+  :after simple
+  :bind
+  ("<C-c>q" . unfill-paragraph)
+  (:map visual-line-mode-map
+        ("<C-M-q>" . unfill-paragraph)
+        )
+  )
+#+end_src
+
 * Terminal Modes
 ** term
 #+begin_src emacs-lisp
