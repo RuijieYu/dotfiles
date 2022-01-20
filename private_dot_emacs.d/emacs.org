@@ -1105,6 +1105,20 @@ processes try to launch an editor to just use the existing frame / window.
   )
 #+end_src
 
+* Registers
+Add a few personal registers for easy accessibility.
+#+begin_src emacs-lisp
+(dolist (file-register '((?e . "~/.emacs.d/emacs.org")
+                         ))
+  (set-register (car file-register)
+                `(file . ,(cdr file-register))))
+
+;; additional registers can be set under ~/.emacs.d/registers.el
+(let ((fname (expand-file-name "~/.emacs.d/registers.el")))
+  (when (file-exists-p fname)
+    (load fname nil nil :nosuffix)))
+#+end_src
+
 * Finishing Up
 Lastly, the garbage collection limit is tuned down to a saner value, but still
 higher than the default value from =emacs=.
