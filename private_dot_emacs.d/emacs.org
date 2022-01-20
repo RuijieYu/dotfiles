@@ -714,6 +714,18 @@ use in that buffer.  Also see `term' and `make-term'."
   )
 #+end_src
 
+** shell in orgmode
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (dolist (lang '((shell . t)
+                  ))
+    (add-to-list 'org-babel-load-languages lang))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   org-babel-load-languages)
+  )
+#+end_src
+
 * Utilities 
 ** =which-key=
 Memories fail. Sometimes I need reminders on what keys correspond to what
