@@ -1,0 +1,56 @@
+#!/bin/bash
+# $1 is sway mode name, assume simple word
+# if $1 is empty, prompt from menu
+set -e
+
+modename="$1"
+
+menu() {
+    bemenu --no-exec -p "$1"
+} </dev/null
+
+# prompt for mode
+test -n "$modename" || {
+    modename="$(menu "sway mode: ")"
+}
+
+# if nothing, quit
+test -n "$modename" -a "$modename" '!=' - || {
+    exit 1
+}
+
+have_mode() {
+    swaymsg -t get_binding_modes |
+        jq -e "match(\"$modename\")"
+} &>/dev/null
+
+ensure_mode() {
+    swaybind() {
+        swaymsg " \
+                mode \"$modename\" \
+                bindsym --to-code --no-warn \
+                $1"
+    }
+    
+    # create some failsafe bindings
+    swaybind " \
+            mod4+Ctrl+Return \
+            mode normal"
+    swaybind " \
+            mod4+m \
+            exec \
+            \$XDG_CONFIG_HOME/sway/config.d/arbitrary-mode"
+    swaybind " \
+            mod4+shift+m \
+            exec \
+            \$XDG_CONFIG_HOME/sway/config.d/arbitrary-mode \
+            --swaymsg"
+}
+
+case "$modename" in
+--swaymsg) swaymsg "$(menu swaymsg)" ;;
+*)
+    # now that we know the mode exists for sure, switch to this mode
+    ensure_mode "$modename"
+    swaymsg mode "$modename" ;;
+esac
