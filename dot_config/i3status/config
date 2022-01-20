@@ -38,7 +38,14 @@ ethernet _first_ {
 }
 
 battery all {
-  format = "B=%status:%percentage"
+  # format = "B=%status:%percentage"
+  format = "%status:%percentage~%remaining"
+  format_down = "NOBAT"
+  status_chr = "⚡CHR"
+  status_bat = "🔋BAT"
+  status_unk = "?UNK"
+  status_full = "☻FUL"
+
 }
 
 disk "/" {
