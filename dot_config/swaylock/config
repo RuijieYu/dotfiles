@@ -1,0 +1,22 @@
+# qol additions
+show-failed-attempts
+show-keyboard-layout
+indicator-caps-lock
+
+# I don't use fingerprint scanning, will probably have to change this
+# when I get a working fp scanner
+ignore-empty-password
+daemonize
+
+# coloring and looks
+color=323232
+## I *think* I don't need to quote the string?
+font=Jetbrains Mono
+font-size=24
+
+# customize indicator
+indicator-radius=50
+indicator-thickness=10
+line-uses-inside
+inside-color=5c5c5c
+separator-color=323232
