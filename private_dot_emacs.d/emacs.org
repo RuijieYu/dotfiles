@@ -468,6 +468,7 @@ Orgmode configurations.
   (dolist (pair '(("sh" . "sh")
 		  ("el" . "emacs-lisp")
 		  ("py" . "python")
+                  ("md" . "markdown")
 		  ;; ("jp" . "jupyter-python")
 		  ))
     ;; use `add-to-list' because it treats the list as a set
