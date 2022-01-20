@@ -9,6 +9,8 @@ ControlPersist yes
 IdentityFile ~/.ssh/%r@%h
 IdentitiesOnly yes
 
+Include ~/.ssh/config.d/*.conf
+
 # some default usernames
 Host github.com
      User git
