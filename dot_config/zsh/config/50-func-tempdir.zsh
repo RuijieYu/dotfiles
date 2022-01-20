@@ -1,0 +1,1 @@
+tempdir() { cd "$(mktemp -d)" ; }
