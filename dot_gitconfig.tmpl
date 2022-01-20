@@ -70,3 +70,6 @@
     trivial-rebase = "!f(){ GIT_EDITOR=: git rebase \"$@\";};GIT_EDITOR=: f"
 [advice]
 	skippedCherryPicks = false
+[rebase]
+	autoSquash = true
+	autoStash = true
