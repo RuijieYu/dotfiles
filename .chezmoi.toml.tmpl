@@ -1,6 +1,19 @@
-{{ $git_email := promptString "git_email" }}
-{{ $name := promptString "name" }}
-
 [data]
+    {{ $git_email := (promptString "git_email") }}
     git_email = {{ $git_email | quote }}
+    
+    {{ $name := (promptString "name") }}
     name = {{ $name | quote }}
+    
+    default_gitsignkey = "719B0ED03204663D0F181F4295430CB30721B6D9"
+    {{ $gitsignkey := (promptString "gitsignkey (empty:disable, \"!\":default key)") }}
+    gitsignkey = {{ $gitsignkey | quote }}
+
+    {{ $fingerprint := (promptBool "allow fingerprint (lock allow empty pw)" false) }}
+    fingerprint = {{ $fingerprint }} # boolean
+
+    {{ $primdisplay := (promptString "primary display from `swaymsg -t get_outputs`" "eDP-1") }}
+    primdisplay = {{ $primdisplay | quote }}
+
+    {{ $secdisplay := (promptString "secondary display from `swaymsg -t get_outputs`" "DP-4") }}
+    secdisplay = {{ $secdisplay | quote }}
