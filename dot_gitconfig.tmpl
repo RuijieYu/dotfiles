@@ -1,6 +1,13 @@
 [user]
 	email = {{ .git_email }}
 	name = {{ .name }}
+	{{ if (eq .gitsignkey "") }}
+	# git signingkey disabled
+	{{ else if (eq .gitsignkey "!") }}
+	signingkey = {{ .default_gitsignkey }}
+	{{ else }}
+	signingkey = {{ .gitsignkey }}
+	{{ end }}
 [init]
 	defaultBranch = main
 
