@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# options:
+# XX -w, --wrap PREFIX: when executing a program, add this prefix
+
+# TODO: use getopt to parse options
+args="$(echo "$(bemenu -p browse </dev/null)")"
+
+# when empty, exit right away
+test -z "$args" && exit 0
+
+# new window, force https (because why not)
+qute_args=(-ws)
+
+qutebrowser ":open ${qute_args[@]} $args"
+
+# TODO: I noticed that running `qutebrowser 'query or url'` works
+# mostly as intended.  The only difference is that the open flag
+# -s cannot be passed in anywhere.  Since default-HTTPS is
+# currently being addressed in #6880, I will wait for that issue
+# to resolve before I make further changes to this keybind and
+# relavent configuration options.
