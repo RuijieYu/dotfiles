@@ -3,9 +3,14 @@ show-failed-attempts
 show-keyboard-layout
 indicator-caps-lock
 
-# I don't use fingerprint scanning, will probably have to change this
-# when I get a working fp scanner
+{{ if (eq .fingerprint false) }}
+# disable fingerprint, force non-empty password
 ignore-empty-password
+{{ else }}
+# enable fingerprint, empty password is possible
+# ignore-empty-password
+{{ end }}
+
 daemonize
 
 # coloring and looks
