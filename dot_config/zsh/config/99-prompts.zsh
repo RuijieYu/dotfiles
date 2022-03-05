@@ -1,6 +1,6 @@
 # Target look:
 #
-# USERNAME@HOSTNAME <SHLVL> [RETVAL] NAMED-PATH $
+# USERNAME@HOSTNAME <SHLVL> [RETVAL] NAMED-PATH [GIT-INFO] $
 #
 # Colored components:
 # - Username, Hostname, "$"
@@ -17,6 +17,8 @@
 # - - only show if (( SHLVL >= 2 ))
 # - [RETVAL]
 # - - only show if (( RETVAL != 0 ))
+# - [GIT-INFO] TODO
+# - - only show if ??
 #
 # Togglable components:
 # - <SHLVL>
@@ -51,9 +53,61 @@ __user_color() {
     print -n "%F{$(__user_color_name)}$1%f"
 }
 
+# function called for [GIT-INFO], whose stdout is used in the prompt
+__git_info() {
+    # [GIT-INFO]
+    local h ch stat
+    {
+        # first, try to get a branch name
+        h="$(git symbolic-ref --short HEAD)"
+        ## color it blue
+        test -n "$h" && h="%F{blue}$h%f"
+        
+        # if failed (empty h), then try to get a hash value
+        test -z "$h" && h="$(git show -s --format=%h)"
+        ## color it yellow
+        test -n "$h" && h="%F{yellow}$h%f"
+        
+        # if empty h, then not at gitdir, exit; otherwise print it
+        test -n "$h" || return 0
+        echo -n "$h"
+
+        # get current git status; ch is the list of change-flags
+        # recognized from the git status
+        stat="$(git status --porcelain=v1)"
+        echo "$stat" | grep -qm1 '^M ' && ch+='%F{green}M%f' # staged modification
+        echo "$stat" | grep -qm1 '^ M' && ch+='%F{red}M%f' # unstaged modification
+        echo "$stat" | grep -qm1 '^D ' && ch+='%F{green}D%f' # staged deletion
+        echo "$stat" | grep -qm1 '^ D' && ch+='%F{red}D%f' # unstaged deletion
+        echo "$stat" | grep -qm1 '^R ' && ch+='%F{green}R%f' # staged rename
+        echo "$stat" | grep -qm1 '^ R' && ch+='%F{red}R%f' # unstaged rename
+        echo "$stat" | grep -qm1 '^C ' && ch+='%F{green}C%f' # staged copy
+        echo "$stat" | grep -qm1 '^ C' && ch+='%F{red}C%f' # unstaged copy
+
+        echo "$stat" | grep -qm1 '^\?\?' && ch+='%F{red}?%f' # untracked file
+
+        local _ch
+        _ch="$(echo "$stat" | grep -Pom1 '^[MDRU]{2}')" # conflicts
+        echo "$stat" | grep -Pqm1 '^[MACTRUD]{2}' && ch+='%F{red}X%f' # conflicts
+
+        
+        # when ch nonempty, print it
+        test -z "$ch" || echo -n " $ch"
+        
+        echo
+    } |
+        # wrap first line into [...]
+        sed '{s/^/[/g; s/$/]/g};q' |
+        # convert the trailing newline into a space
+        tr '\n' ' '
+} 2>/dev/null
+
 __theme_load() {
     # load colors
     autoload -Uz colors && colors
+
+    # this prompt line requires executing commands for each prompt
+    setopt prompt_subst
 
     # clear PS1 and RPS1
     export PS1= RPS1=
@@ -76,6 +130,9 @@ __theme_load() {
 
     # NAMED-PATH
     PS1+='%~ '
+
+    # [GIT-INFO]
+    PS1+='$(__git_info)'
 
     # $
     PS1+="$(__user_color '%(!.#.$)') "
