@@ -1,0 +1,16 @@
+#!/bin/sh
+xbacklight -version &>/dev/null
+
+# xbacklight from xorg-xbacklight will output a version string,
+# whereas that from acpilight errors out with retval 2.
+case $? in
+    0) xbacklight "$@" ;;
+    2) for ctrl in $(xbacklight -list | sed -n '/^ddcci\|backlight$/p'); do
+           # do the same action for each sensible controller (ddcci
+           # for external monitor, courtesy of
+           # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux,
+           # and *_backlight for laptop monitor)
+           xbacklight -ctrl "$ctrl" "$@"
+       done ;;
+    127) exit 10 ;;
+esac
