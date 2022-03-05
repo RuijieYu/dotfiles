@@ -1,0 +1,39 @@
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+
+set $out_primary eDP-1
+set $out_second {{ .secdisplay }}
+
+bar {
+    id i3blocks-1
+    position top
+    output *
+
+    workspace_buttons yes
+    tray_output *
+
+    status_command i3blocks -c $HOME/.config/i3blocks/config.1
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+    }
+}
+
+bar {
+    id i3blocks-2
+    position top
+    output $out_primary
+    
+    workspace_buttons no
+    tray_output none
+
+    status_command sleep 1s ; i3blocks -c $HOME/.config/i3blocks/config.2
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+    }
+}
