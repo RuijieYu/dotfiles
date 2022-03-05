@@ -1,4 +1,5 @@
 #!/bin/sh
+EMACS_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/emacs"
 
 get_path() {
     if type brew &>/dev/null; then
@@ -17,10 +18,10 @@ get_path() {
     fi
 } 2>/dev/null
 
-mkdir -p ~/.emacs.d && {
+mkdir -p "$EMACS_CONFIG_DIR/" && {
     clang_format_path="$(get_path)"
     test -z "$clang_format_path" ||
         ln -vsfT \
            "$clang_format_path" \
-           ~/.emacs.d/clang-format
+           "$EMACS_CONFIG_DIR/"clang-format
 }
