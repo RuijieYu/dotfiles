@@ -1,1 +1,1 @@
-alias s=systemctl j=journalctl
+alias s=systemctl j=journalctl m=machinectl n=networkctl b=bootctl
