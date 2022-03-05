@@ -140,13 +140,17 @@ config.set('content.javascript.enabled', True, 'qute://*/*')
 
 # set search engines, using shipped default of duckduckgo
 config.get('url.searchengines').update({
+    # dev
+    'gh': 'https://github.com/search?q={}',
     # arch
     'arch': 'https://wiki.archlinux.org/?search={}',
     'arch=': 'https://wiki.archlinux.org/title/{}',
     'aur': 'https://aur.archlinux.org/packages/?K={}',
     'aur=': 'https://aur.archlinux.org/packages/{}',
     # dictionary
-    'mw': 'https://www.merriam-webster.com/dictionary/{}',
+    'mw': 'https://merriam-webster.com/dictionary/{}',
+    # random stuff
+    'yt': 'https://youtube.com/results?search_query={}',
 })
 
 # tabs are windows
@@ -174,7 +178,7 @@ def _emacsclient_command():
                 '-c',               # --create-frame
                 '-s',               # --socket-name=SOCKET_FNAME
                 str(daemon) if daemon
-                else (emacs_daemon_dir / 'server'),
+                else str(emacs_daemon_dir / 'server'),
                 '+{line}:{column}', # see :help editor.command
                 '{file}',
                 ]
@@ -193,8 +197,11 @@ config.set('editor.command',
            _emacsclient_command())
 
 # get userscript qute-pass to work
-_wl_dmenu, _x_dmenu = 'bemenu', 'dmenu' # default for wayland / x11
-                                        # dmenu alternatives
+
+# the menu program for *selecting* accounts.  Password prompts are
+# handled via gpg-agent.
+_wl_dmenu, _x_dmenu = 'bemenu -i', 'dmenu'
+
 def _get_dmenu():
     return (_wl_dmenu if env.get('WAYLAND_DISPLAY')
             else _x_dmenu)
@@ -218,3 +225,6 @@ for mode in ('normal', 'insert', 'prompt'):
     config.bind('<Ctrl-U>', _qute_pass('--username-only'), mode=mode)
     config.bind('<Ctrl-P>', _qute_pass('--password-only'), mode=mode)
     config.bind('<Ctrl-O>', _qute_pass('--otp-only'), mode=mode)
+
+# reload config easily with alt-f5
+config.bind('<Alt-F5>', 'config-source')
