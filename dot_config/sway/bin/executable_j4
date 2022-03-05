@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# $1: BEMENU_OPTS
+# $2: j4 fifo
+# $3: terminal emulator
+
+j4=j4-dmenu-desktop
+j4_flock="$XDG_RUNTIME_DIR/j4.lck"
+j4_cache="${XDG_CACHE_HOME:-$HOME/.cache}/$j4"
+
+export BEMENU_OPTS="${1:--il1}"
+j4_fifo="${2:-$XDG_RUNTIME_DIR/j4.fifo}"
+term="${3:-kitty}"
+
+mkdir -p "$j4_cache"
+killall -u "$USER" "$j4"
+rm -f "$j4_fifo"
+"$j4" --dmenu "bemenu -pj4" \
+      --display-binary \
+      --term "$term" \
+      --usage-log "$j4_cache/j4.usage" \
+      --wrapper 'swaymsg exec' \
+      --wait-on "$j4_fifo"
