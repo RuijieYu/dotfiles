@@ -3,8 +3,25 @@
 # options:
 # XX -w, --wrap PREFIX: when executing a program, add this prefix
 
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+quickmark_read() {
+    # each line is "QM-NAME QM-URL"
+    awk '{print $1}' <"$1"
+}
+
 # TODO: use getopt to parse options
-args="$(echo "$(bemenu -p browse </dev/null)")"
+bemenu_browse() {
+    local qm="$XDG_CONFIG_HOME/qutebrowser/quickmarks"
+    # when quickmark file exists, read its quickmark definitions
+    test -r "$qm" && exec < <(quickmark_read "$qm")
+    # run bemenu
+    echo "$(bemenu -p browse)"
+} </dev/null
+
+# args="$(echo "$(bemenu -p browse </dev/null)")"
+
+args="$(bemenu_browse)"
 
 # when empty, exit right away
 test -z "$args" && exit 0
