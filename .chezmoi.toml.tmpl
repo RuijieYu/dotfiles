@@ -1,19 +1,74 @@
 [data]
-    {{ $git_email := (promptString "git_email") }}
+    {{  $git_email := "" }}
+    {{- if(hasKey . "git_email") -}}
+    {{-   $git_email = .git_email -}}
+    {{- else -}}
+    {{-  $git_email = (promptString "git_email") -}}
+    {{- end -}}
     git_email = {{ $git_email | quote }}
-    
-    {{ $name := (promptString "name") }}
+
+    {{  $name := "" }}
+    {{- if(hasKey . "name") -}}
+    {{-   $name = .name -}}
+    {{- else -}}
+    {{-  $name = (promptString "name") -}}
+    {{- end -}}
     name = {{ $name | quote }}
-    
+
     default_gitsignkey = "719B0ED03204663D0F181F4295430CB30721B6D9"
-    {{ $gitsignkey := (promptString "gitsignkey (empty:disable, \"!\":default key)") }}
+
+    {{  $gitsignkey := "" }}
+    {{- if(hasKey . "gitsignkey") -}}
+    {{-   $gitsignkey = .gitsignkey -}}
+    {{- else -}}
+    {{-   $gitsignkey = (promptString "gitsignkey (empty:disable, \"!\":default key)") -}}
+    {{- end -}}
     gitsignkey = {{ $gitsignkey | quote }}
 
-    {{ $fingerprint := (promptBool "allow fingerprint (lock allow empty pw)" false) }}
-    fingerprint = {{ $fingerprint }} # boolean
+    {{  $fingerprint := false }}
+    {{- if(hasKey . "fingerprint") -}}
+    {{-   $fingerprint = .fingerprint -}}
+    {{- else -}}
+    {{-   $fingerprint = (promptBool "allow fingerprint (lock allow empty pw)" false) -}}
+    {{- end -}}
+    fingerprint = {{ $fingerprint -}} # boolean
 
-    {{ $primdisplay := (promptString "primary display from `swaymsg -t get_outputs`" "eDP-1") }}
+    {{  $primdisplay := "" }}
+    {{- if(hasKey . "primdisplay") -}}
+    {{-   $primdisplay = .primdisplay -}}
+    {{- else -}}
+    {{-   $primdisplay = (promptString "primary display from `swaymsg -t get_outputs`" "eDP-1") -}}
+    {{- end -}}
     primdisplay = {{ $primdisplay | quote }}
 
-    {{ $secdisplay := (promptString "secondary display from `swaymsg -t get_outputs`" "DP-4") }}
+    {{  $secdisplay := "" }}
+    {{- if(hasKey . "secdisplay") -}}
+    {{-   $secdisplay = .secdisplay -}}
+    {{- else -}}
+    {{-   $secdisplay = (promptString "secondary display from `swaymsg -t get_outputs`" "DP-4") -}}
+    {{- end -}}
     secdisplay = {{ $secdisplay | quote }}
+
+    {{  $time1 := "" }}
+    {{- if(hasKey . "time1") -}}
+    {{-   $time1 = .time1  -}}
+    {{- else -}}
+    {{-   $time1 = (promptString "first timezone" "UTC") -}}
+    {{- end -}}
+    time1 = {{ $time1 | quote }}
+
+    {{  $time2 := "" }}
+    {{- if(hasKey . "time2") -}}
+    {{-   $time2 = .time2 -}}
+    {{- else -}}
+    {{-   $time2 = (promptString "second timezone" "UTC") -}}
+    {{- end -}}
+    time2 = {{ $time2 | quote }}
+
+    {{  $time3 := "" }}
+    {{- if(hasKey . "time3") -}}
+    {{-   $time3 = .time3 -}}
+    {{- else -}}
+    {{-   $time3 = (promptString "third timezone" "UTC") -}}
+    {{- end -}}
+    time3 = {{ $time3 | quote }}
