@@ -1,0 +1,48 @@
+# i3blocks configuration file
+#
+# The i3blocks man page describes the usage of the binary,
+# and its website describes the configuration:
+#
+#     https://vivien.github.io/i3blocks
+
+# i3blocks-contrib scripts here
+SCRIPT_DIR=/usr/lib/i3blocks
+
+# Global properties
+separator=true
+separator_block_width=12
+markup=pango
+
+[bandwidth2]
+command=$SCRIPT_DIR/bandwidth2
+interval=persist
+LABEL=
+
+[cpu_usage2]
+command=$SCRIPT_DIR/cpu_usage2
+interval=persist
+WARN_PERCENT=50
+CRIT_PERCENT=80
+REFRESH_TIME=2
+LABEL=C
+
+[memory]
+command=$SCRIPT_DIR/memory
+label=M 
+instance=mem
+interval=15
+
+[temperature]
+command=$SCRIPT_DIR/temperature
+label=T
+interval=1
+T_WARN=60
+T_CRIT=75
+
+[time2]
+command=TZ={{- .time2 }} date '+%a %T %Z'
+interval=1
+
+[time3]
+command=TZ={{- .time3 }} date '+%a %T %Z'
+interval=1
