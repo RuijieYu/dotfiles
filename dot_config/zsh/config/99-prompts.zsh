@@ -42,7 +42,7 @@ __theme_check_flag() {
 # get the color name for the user components
 __user_color_name() {
     if test -n "$SSH_CONNECTION"; then
-        print -n '%(!.purple.cyan)'
+        print -n '%(!.cyan.blue)'
     else
         print -n '%(!.red.green)'
     fi
