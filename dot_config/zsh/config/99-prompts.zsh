@@ -84,12 +84,11 @@ __git_info() {
         echo "$stat" | grep -qm1 '^C ' && ch+='%F{green}C%f' # staged copy
         echo "$stat" | grep -qm1 '^ C' && ch+='%F{red}C%f' # unstaged copy
 
-        echo "$stat" | grep -qm1 '^\?\?' && ch+='%F{red}?%f' # untracked file
+        echo "$stat" | grep -qm1 '^??' && ch+='%F{yellow}?%f' # untracked file
 
         local _ch
         _ch="$(echo "$stat" | grep -Pom1 '^[MDRU]{2}')" # conflicts
         echo "$stat" | grep -Pqm1 '^[MACTRUD]{2}' && ch+='%F{red}X%f' # conflicts
-
         
         # when ch nonempty, print it
         test -z "$ch" || echo -n " $ch"
