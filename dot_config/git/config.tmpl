@@ -75,6 +75,30 @@
 
     # (interactive) rebase without using an actual editor
     trivial-rebase = "!f(){ GIT_EDITOR=: git rebase \"$@\";};GIT_EDITOR=: f"
+
+    ## ref: https://stackoverflow.com/a/4207176
+    # diff-commit-1 A B [C ...], find commits in A but not in B, C, ...
+    diff-commit-1 = "!f(){ \
+                  test $# -gt 1 || return; \
+                  local commits=(); \
+                  commits+=(\"$1\"); shift; \
+                  for arg; do \
+                      test \"$arg\" = -- && { shift; break; } ; \
+                      commits+=(\"^$arg\"); \
+                  done; \
+                  git log --oneline --abbrev-commit \
+                  \"${commits[@]}\" \"$@\";};f"
+
+    # diff-commit-2 A B, an alternative implementation using triple dot syntax
+    diff-commit-2 = "!f(){ \
+                  git log --oneline --abbrev-commit \
+                  --left-right \
+                  \"$1...$2\" ;};f"
+
+    # apparently, cherry does that...
+    diff-commit-3 = cherry -v
+    diff-commit = diff-commit-3
+
 [advice]
 	skippedCherryPicks = false
 [rebase]
