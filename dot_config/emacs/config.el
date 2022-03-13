@@ -34,10 +34,13 @@
 (cfg-load "exit.el")
 (cfg-load "spell.el")
 (cfg-load "lsp.el")
+(cfg-load "chezmoi.el")
 
 ;; dev environments
 (cfg-load "racket.el")
 (cfg-load "java.el")
+(cfg-load "local.el")
+(cfg-load "cpp.el")
 
 ;; make sure buffer "*Compile-Log*" does not show up after startup
 (unless :disabled
@@ -222,6 +225,8 @@
 
 ;; ligature
 (use-package ligature
+  ;; ligature has issues in emacs <28
+  :if (version<= "28" emacs-version)
   :demand t
   :straight (ligature :host github
                       :repo "mickeynp/ligature.el"
