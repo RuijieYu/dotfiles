@@ -40,9 +40,11 @@ T_WARN=60
 T_CRIT=75
 
 [time2]
-command=TZ={{- .time2 }} date '+%a %T %Z'
+command=date '+%a %T %Z'
+TZ={{- .time2 }}
 interval=1
 
 [time3]
-command=TZ={{- .time3 }} date '+%a %T %Z'
+command=date '+%a %T %Z'
+TZ={{- .time3 }}
 interval=1

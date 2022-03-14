@@ -115,6 +115,7 @@ interval=once
 format=json
 
 [time1]
-command=TZ={{- .time1 }} date '+%a %FT%T-%Z'
+command=date '+%a %FT%T-%Z'
+TZ={{- .time1 }}
 color=#028548
 interval=1
