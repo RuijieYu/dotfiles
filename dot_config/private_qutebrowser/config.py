@@ -64,7 +64,8 @@ config.set('content.cookies.accept', 'all', 'devtools://*')
 # Value to send in the `Accept-Language` header. Note that the value
 # read from JavaScript is always the global value.
 # Type: String
-config.set('content.headers.accept_language', '', 'https://matchmaker.krunker.io/*')
+config.set('content.headers.accept_language', '',
+           'https://matchmaker.krunker.io/*')
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -80,7 +81,10 @@ config.set('content.headers.accept_language', '', 'https://matchmaker.krunker.io
 # between 5.12 and 5.14 (inclusive), changing the value exposed to
 # JavaScript requires a restart.
 # Type: FormatString
-config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}', 'https://web.whatsapp.com/')
+config.set(
+    'content.headers.user_agent',
+    'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}',
+    'https://web.whatsapp.com/')
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -96,7 +100,9 @@ config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/{w
 # between 5.12 and 5.14 (inclusive), changing the value exposed to
 # JavaScript requires a restart.
 # Type: FormatString
-config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:90.0) Gecko/20100101 Firefox/90.0', 'https://accounts.google.com/*')
+config.set('content.headers.user_agent',
+           'Mozilla/5.0 ({os_info}; rv:90.0) Gecko/20100101 Firefox/90.0',
+           'https://accounts.google.com/*')
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -112,7 +118,10 @@ config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:90.0) Gecko
 # between 5.12 and 5.14 (inclusive), changing the value exposed to
 # JavaScript requires a restart.
 # Type: FormatString
-config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99 Safari/537.36', 'https://*.slack.com/*')
+config.set(
+    'content.headers.user_agent',
+    'Mozilla/5.0 ({os_info}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99 Safari/537.36',
+    'https://*.slack.com/*')
 
 # Load images automatically in web pages.
 # Type: Bool
@@ -141,16 +150,25 @@ config.set('content.javascript.enabled', True, 'qute://*/*')
 # set search engines, using shipped default of duckduckgo
 config.get('url.searchengines').update({
     # dev
-    'gh': 'https://github.com/search?q={}',
+    'gh':
+    'https://github.com/search?q={}',
+    'cpp':
+    'https://duckduckgo.com/?sites=cppreference.com&q={}',
     # arch
-    'arch': 'https://wiki.archlinux.org/?search={}',
-    'arch=': 'https://wiki.archlinux.org/title/{}',
-    'aur': 'https://aur.archlinux.org/packages/?K={}',
-    'aur=': 'https://aur.archlinux.org/packages/{}',
+    'arch':
+    'https://wiki.archlinux.org/?search={}',
+    'arch=':
+    'https://wiki.archlinux.org/title/{}',
+    'aur':
+    'https://aur.archlinux.org/packages/?K={}',
+    'aur=':
+    'https://aur.archlinux.org/packages/{}',
     # dictionary
-    'mw': 'https://merriam-webster.com/dictionary/{}',
+    'mw':
+    'https://merriam-webster.com/dictionary/{}',
     # random stuff
-    'yt': 'https://youtube.com/results?search_query={}',
+    'yt':
+    'https://youtube.com/results?search_query={}',
 })
 
 # tabs are windows
@@ -162,39 +180,38 @@ config.set('tabs.tabs_are_windows', True)
 # tell) is the default of no distros.
 from os import environ as env
 
+
 def _emacsclient_command():
     'Return the command line arguments used for invoking `emacsclient`.'
     from pathlib import Path
     from typing import Optional
-    xdg_runtime_dir = Path(env.get('XDG_RUNTIME_DIR') or
-                           '~/.local/run').expanduser()
+    xdg_runtime_dir = Path(env.get('XDG_RUNTIME_DIR')
+                           or '~/.local/run').expanduser()
     emacs_daemon_dir = xdg_runtime_dir / 'emacs'
 
-
-    def _construct_emacsclient(
-            daemon: Optional[Path] = None):
+    def _construct_emacsclient(daemon: Optional[Path] = None):
         'daemon is an absolute path for the emacs daemon socket.'
-        return ['emacsclient',
-                '-c',               # --create-frame
-                '-s',               # --socket-name=SOCKET_FNAME
-                str(daemon) if daemon
-                else str(emacs_daemon_dir / 'server'),
-                '+{line}:{column}', # see :help editor.command
-                '{file}',
-                ]
-    
+        return [
+            'emacsclient',
+            '-c',  # --create-frame
+            '-s',  # --socket-name=SOCKET_FNAME
+            str(daemon) if daemon else str(emacs_daemon_dir / 'server'),
+            '+{line}:{column}',  # see :help editor.command
+            '{file}',
+        ]
+
     try:
         # look for the first socket
-        first_socket = next((file
-                             for file
-                             in emacs_daemon_dir.iterdir()
-                             if file.is_socket()), None)
+        first_socket = next(
+            (file for file in emacs_daemon_dir.iterdir() if file.is_socket()),
+            None)
         return _construct_emacsclient(first_socket)
-    except FileNotFoundError: pass # directory does not exist
+    except FileNotFoundError:
+        pass  # directory does not exist
     return _construct_emacsclient()
 
-config.set('editor.command',
-           _emacsclient_command())
+
+config.set('editor.command', _emacsclient_command())
 
 # get userscript qute-pass to work
 
@@ -202,21 +219,23 @@ config.set('editor.command',
 # handled via gpg-agent.
 _wl_dmenu, _x_dmenu = 'bemenu -i', 'dmenu'
 
+
 def _get_dmenu():
-    return (_wl_dmenu if env.get('WAYLAND_DISPLAY')
-            else _x_dmenu)
+    return (_wl_dmenu if env.get('WAYLAND_DISPLAY') else _x_dmenu)
+
+
 def _qute_pass(arg='', *, dmenu=None):
     dmenu = dmenu or _get_dmenu()
 
-    env.setdefault('PASSWORD_STORE_DIR',
-                   (f'{env["HOME"]}/'
-                    '.local/share/'
-                    'pass/password-store'))
+    env.setdefault('PASSWORD_STORE_DIR', (f'{env["HOME"]}/'
+                                          '.local/share/'
+                                          'pass/password-store'))
 
     return ('spawn --userscript qute-pass '
             f'-d "{dmenu}" '
             f'-p "{env["PASSWORD_STORE_DIR"]}" '
             f'{arg}')
+
 
 for mode in ('normal', 'insert', 'prompt'):
     config.bind('<Ctrl-Return>', _qute_pass(), mode=mode)
