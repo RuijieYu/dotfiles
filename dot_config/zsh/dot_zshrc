@@ -3,11 +3,14 @@ local -r ZSHRC_DIR="$HOME/.config/zsh"
 local -r ZSHRC="$ZSHRC_DIR/.zshrc"
 local -r ZSHRC_CONFIG="$ZSHRC_DIR/config"
 for file in $(find -L \
-                   "$ZSHRC_CONFIG/" \
-		   -depth \
-		   -type f \
-		   -name \*.zsh | sort); do
-    # not using -readable because it is not portable
-    test ! -r "$file" || source "$file"
+	"$ZSHRC_CONFIG/" \
+	-depth \
+	-type f \
+	-name \*.zsh | sort); do
+	# not using -readable because it is not portable
+	if test -n "$ZSH_LIST_FILES"; then
+		echo "$file"
+	else
+		test ! -r "$file" || source "$file"
+	fi
 done
-
