@@ -72,3 +72,22 @@
     {{-   $time3 = (promptString "third timezone" "UTC") -}}
     {{- end -}}
     time3 = {{ $time3 | quote }}
+
+    # primary font
+    {{  $fontsize := "14" }}
+    {{- if(hasKey . "fontsize") -}}
+    {{-   $fontsize = .fontsize -}}
+    {{- else -}}
+    {{-   $fontsize = (promptString "primary font size (int | float)" "14") -}}
+    {{- end -}}
+    fontsize = {{ $fontsize }} # should be integer or float
+
+    # primary font
+    {{ $font := "JetBrains Mono" -}}
+    {{- if(hasKey . "font") -}}
+    {{-   $font = .font -}}
+    {{- else -}}
+    {{-   $font = (promptString "primary font name" "JetBrains Mono") -}}
+    {{- end -}}
+    font = {{ $font | quote }}
+    
