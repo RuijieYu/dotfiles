@@ -5,17 +5,15 @@
 output * bg /usr/share/backgrounds/archlinux/small.png fill
 
 # my specific setup: 2x laptop, external on TOP of laptop
-# output * dpms off
-output {{ .primdisplay }} {
-       scale 2
-       position 0 0
+output {{ .secdisplay }} {
+       scale 1
+       resolution 1920x1080
+       position 0 -1080
 }
 
-output {{ .secdisplay }} {
-       scale 1.25
-       resolution 1920x1080
-       # 1080 / 1.25
-       position 0 -864
+output {{ .primdisplay }} {
+       scale 1
+       position 0 0
 }
 
 #
