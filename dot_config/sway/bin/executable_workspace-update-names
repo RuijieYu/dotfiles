@@ -1,0 +1,14 @@
+#!/bin/sh
+# $0 [start1 end1] [start2 end2] ...
+#
+# if only 0 or 1 arguments, go from 1 to 10 instead.
+test $# -lt 2 && set -- 1 10
+
+while test $# -ge 2; do
+	for i in $(seq "$1" "$2"); do
+		swaymsg rename workspace \
+			number "$i" to \
+			"\$ws$i"
+	done
+	shift 2
+done 2>/dev/null
