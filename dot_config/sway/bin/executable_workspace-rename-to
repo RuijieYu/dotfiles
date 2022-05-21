@@ -1,0 +1,22 @@
+#!/bin/sh
+# req: jq
+#
+# $1 = moved-to workspace name
+
+# $1 = the workspace name to query
+workspace_exists() {
+    swaymsg --raw --type get_workspaces |
+        jq '.[] | .name' |
+        grep -xq "\"$1\""
+}
+
+# rename current workspace to new name $1
+main() {
+    # the new workspace already exists
+    workspace_exists "$1" && exit 1
+
+    # perform the renaming process
+    swaymsg rename workspace to "$1"
+}
+
+main "$@"
