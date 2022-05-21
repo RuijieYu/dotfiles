@@ -7,6 +7,7 @@
 
 # i3blocks-contrib scripts here
 SCRIPT_DIR=/usr/lib/i3blocks
+LOCAL_SCRIPT=/home/ruijie/.local/bin
 
 # Global properties
 separator=true
@@ -23,11 +24,11 @@ command=$SCRIPT_DIR/cpu_usage2
 interval=persist
 WARN_PERCENT=50
 CRIT_PERCENT=80
-REFRESH_TIME=2
+REFRESH_TIME=5
 LABEL=C
 
 [memory]
-command=$SCRIPT_DIR/memory
+command=$LOCAL_SCRIPT/memory
 label=M 
 instance=mem
 interval=15
