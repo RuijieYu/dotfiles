@@ -1,0 +1,38 @@
+#!/bin/bash
+# select my favorate terminal emulator to use
+#
+# $0 [options] [--] [commands]
+
+readonly choice=/usr/bin/alacritty
+
+run() { exec "$choice" "$@"; }
+
+parse() {
+    local mode=0
+    for arg; do
+        if ((mode)); then cmd+=("$arg"); else
+            case "$arg" in
+            --) mode=1 ;;
+            *) opts+=("$arg") ;;
+            esac
+        fi
+    done
+}
+
+main() {
+    local opts=() cmd=()
+    parse "$@"
+
+    case "$choice" in
+    */kitty) run "${opts[@]}" "${cmd[@]}" ;;
+    */alacritty)
+        if ((${#cmd} > 0)); then
+            run "${opts[@]}" -e "${cmd[@]}"
+        else
+            run "${opts[@]}"
+        fi
+        ;;
+    esac
+}
+
+main "$@"

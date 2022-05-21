@@ -2,7 +2,7 @@
 #
 # $1: BEMENU_OPTS
 # $2: j4 fifo
-# $3: terminal emulator
+# $3: terminal emulator, default = ~/.local/bin/terminal
 
 j4=j4-dmenu-desktop
 j4_flock="$XDG_RUNTIME_DIR/j4.lck"
@@ -10,7 +10,9 @@ j4_cache="${XDG_CACHE_HOME:-$HOME/.cache}/$j4"
 
 export BEMENU_OPTS="${1:--il1}"
 j4_fifo="${2:-$XDG_RUNTIME_DIR/j4.fifo}"
-term="${3:-kitty}"
+term="${3:-$HOME/.local/bin/terminal}"
+
+export PATH="$(dirname "$0"):$HOME/.local/bin:$PATH"
 
 mkdir -p "$j4_cache"
 killall -u "$USER" "$j4"
