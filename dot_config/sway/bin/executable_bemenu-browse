@@ -1,39 +1,131 @@
-#!/bin/sh
+#!/bin/bash -u
 
 # options:
-# XX -w, --wrap PREFIX: when executing a program, add this prefix
+# -p, --private: add -p flag for qutebrowser :open
+
+# -c, --clip[=TARGET]: use clipboard as query.  TARGET should be
+# -from default, primary, secondary, clip, default being
+# -'default'.  'default' is to specify nothing; 'primary' is to
+# -use primary selection, 'secondary' is to use secondary
+# -selection on X11, and primary on wayland; 'clip' is to use
+# -clipboard.
+
+readonly SCRIPTDIR="$(dirname "$0")"
+export PATH="$SCRIPTDIR:$HOME/.local/bin:$PATH"
+
+window=-w # always new window
+prompt=browse
+
+eval set -- \
+	"$(getopt -ohpc:: -l help,private,clip:: -- "$@")"
+
+print_help() {
+	local prog="$(basename "$0")"
+	cat <<-EOF
+		$prog
+		Usage:
+		    $prog (--help | -h)
+		    $prog [options]
+
+		Options:
+		    -c, --clip [=TARGET]  Use clipboard TARGET as query instead of
+		                          query.  TARGET can take values of
+		                          'default', 'primary', 'secondary', and
+		                          'clip'.  When no argument supplied,
+		                          default to 'default'.
+		    -p, --private         When opening up the browser, use private
+		                          mode.
+	EOF
+	exit
+}
+
+private=
+clip=
+while true; do
+	case "$1" in
+	--help | -h) print_help ;;
+	--private | -p) private=1 ;;
+	--clip | -c)
+		clip="$2"
+		test -z "$clip" && clip=default
+		shift
+		;;
+	--) break ;;
+	\?) echo 'Acceptable clipboard targets are the following:' \
+		'default primary secondary clip' ;;
+	esac
+	shift
+done
+
+test -n "$private" && {
+	window=-p
+	prompt='private browse'
+}
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 quickmark_read() {
-    # each line is "QM-NAME QM-URL"
-    awk '{print $1}' <"$1"
+	# each line is "QM-NAME QM-URL"
+	awk '{print $1}' <"$1"
 }
 
 # TODO: use getopt to parse options
 bemenu_browse() {
-    local qm="$XDG_CONFIG_HOME/qutebrowser/quickmarks"
-    # when quickmark file exists, read its quickmark definitions
-    test -r "$qm" && exec < <(quickmark_read "$qm")
-    # run bemenu
-    echo "$(bemenu -p browse)"
+	local qm="$XDG_CONFIG_HOME/qutebrowser/quickmarks"
+	# when quickmark file exists, read its quickmark definitions
+	test -r "$qm" && exec < <(quickmark_read "$qm")
+	# run bemenu
+	echo "$(bemenu -p "$prompt")"
 } </dev/null
 
-# args="$(echo "$(bemenu -p browse </dev/null)")"
+# paste with clipboard
+clip_paste() {
+	local which=() type=(-t text)
+	# wayland clipboard
+	test -n "$WAYLAND_DISPLAY" && {
+		case "$clip" in
+		primary) which+=(-p) ;;
+		secondary) which+=(-p) ;;
+		clip) ;;
+		esac
+		wl-paste "${which[@]}" "${type[@]}"
+		return $?
+	}
+	# x11 clipboard
+	test -n "$DISPLAY" && {
+		case "$clip" in
+		primary) which='-selection primary' ;;
+		secondary) which='-selection secondary' ;;
+		clip) which='-selection clipboard' ;;
+		esac
+		xclip "${which[@]}" "${type[@]}" -o
+		return $?
+	}
+	# cannot interact with clipboard
+	exit 1
+}
 
-args="$(bemenu_browse)"
+args=
+# if using clipboard, just read from clipboard; otherwise use menu
+# prompt
+if test -n "$clip"; then
+	args+="$(clip_paste)"
+else
+	args+="$(bemenu_browse)"
+fi
 
 # when empty, exit right away
 test -z "$args" && exit 0
 
-# new window, force https (because why not)
-qute_args=(-ws)
+# force https (because why not)
+https=-s
 
-qutebrowser ":open ${qute_args[@]} $args"
+qutebrowser ":open $window $https $args"
 
 # TODO: I noticed that running `qutebrowser 'query or url'` works
 # mostly as intended.  The only difference is that the open flag
 # -s cannot be passed in anywhere.  Since default-HTTPS is
-# currently being addressed in #6880, I will wait for that issue
-# to resolve before I make further changes to this keybind and
-# relavent configuration options.
+# currently being addressed in
+# https://github.com/qutebrowser/qutebrowser/issues/6880, I will
+# wait for that issue to resolve before I make further changes to
+# this keybind and relavent configuration options.
