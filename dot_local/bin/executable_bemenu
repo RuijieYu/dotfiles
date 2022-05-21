@@ -1,0 +1,24 @@
+#!/bin/sh
+# $0: bemenu or bemenu-run
+BEMENU="$(basename "$0")"
+case "$BEMENU" in
+bemenu | bemenu-run) ;;
+*) exit -1 ;;
+esac
+
+err() { echo "$@"; } >&2
+ecat() { cat; } >&2
+
+# always display on current monitor
+BEMENU_OPTS="-m -1 $BEMENU_OPTS"
+
+# set larger font size
+BEMENU_OPTS="--fn 'JetBrains Mono 14' $BEMENU_OPTS"
+
+export BEMENU_OPTS
+
+ecat <<-EOF
+	BEMENU_OPTS="$BEMENU_OPTS"
+	ARGS="$@"
+EOF
+/usr/bin/"$BEMENU" "$@"
