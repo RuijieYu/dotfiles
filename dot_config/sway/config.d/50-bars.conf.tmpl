@@ -3,22 +3,27 @@
 #
 # Read `man 5 sway-bar` for more information about this section.
 
-set $out_primary eDP-1
+set $out_primary {{ .primdisplay }}
 set $out_second {{ .secdisplay }}
 
 bar {
     id i3blocks-1
     position top
     output *
+    tray_output *
 
     workspace_buttons yes
-    tray_output *
 
     status_command i3blocks -c $HOME/.config/i3blocks/config.1
     colors {
         statusline #ffffff
         background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
+        focused_background #323232
+        focused_workspace #323277 #323277 #a2a2a2
+        active_workspace #6032aa #6032aa #a2a2a2
+        inactive_workspace #323232 #323232 #a2a2a2
+        urgent_workspace #773200 #773200 #a2a2a2
+        binding_mode #aaaa77 #aaaa77 #323232
     }
 }
 
@@ -26,14 +31,19 @@ bar {
     id i3blocks-2
     position top
     output $out_primary
+    tray_output none
     
     workspace_buttons no
-    tray_output none
 
-    status_command sleep 1s ; i3blocks -c $HOME/.config/i3blocks/config.2
+    status_command i3blocks -c $HOME/.config/i3blocks/config.2
     colors {
         statusline #ffffff
         background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
+        focused_background #323232
+        focused_workspace #3232aa #3232aa #a2a2a2
+        active_workspace #7732aa #7732aa #a2a2a2
+        inactive_workspace #323232 #323232 #a2a2a2
+        urgent_workspace #773200 #773200 #a2a2a2
+        binding_mode #aaaa77 #aaaa77 #323232
     }
 }
