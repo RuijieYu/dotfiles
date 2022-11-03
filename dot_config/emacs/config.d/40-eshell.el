@@ -11,6 +11,18 @@
 (use-package esh-mode
   :straight nil)
 
+;; add additional exports
+;;;###autoload
+(defun cfg-eshell-export (name val &optional no-export)
+  "Export NAME=VAL to all eshell environments, unless NO-EXPORT is
+non-nil.  Here VAL is a simple string value to be passed
+verbatim."
+  (require 'esh-var)
+  (setq-default eshell-variable-aliases-list
+                (delete-dups
+                 (cons (list name (lambda () val) t t)
+                       eshell-variable-aliases-list))))
+
 ;;;###autoload
 (use-package esh-opt
   :straight nil

@@ -22,18 +22,23 @@
     "&&" "^=" "~~" "~@" "~>"
     "~-" "**" "*>" "*/" "||" "|}"
     "|]" "|=" "|>" "|-" "{|" "[|"
-    "]#" "::" ":=" ":>" ":<" "$>"
+    "]#" ;; "::"
+    ":=" ":>" ":<" "$>"
     "==" "=>" "!=" "!!" ">:" ">="
     ">>" ">-" "-~" "-|" "->" "--"
     "-<" "<~" "<*" "<|" "<:" "<$"
     "<=" "<>" "<-" "<<" "<+" "</"
-    "#{" "#[" "#:" "#=" "#!" "##"
+    ;; "#{"
+    ;; "#["
+    "#:" "#=" "#!" "##"
     "#(" "#?" "#_" "%%" ".=" ".-"
     ".." ".?" "+>" "++" "?:" "?="
     "?." "??" ";;" "/*" "/=" "/>"
-    "//" "__" "~~" "(*" "*)"
+    "//" "__" "~~"
+    ;; "(*" "*)"
     ;; "\\\\" "~="
-    ))
+    )
+  "Shared ligatures amongst `prog-mode' buffers.")
 
 ;;;###autoload
 (use-package ligature
@@ -49,7 +54,12 @@
   ;; Enable traditional ligature support in eww-mode, if the
   ;; `variable-pitch' face supports it
   (ligature-set-ligatures
-   'eww-mode '("ff" "fi" "ffi"))
+   #'eww-mode '("ff" "fi" "ffi"))
+  ;; rust ligatures
+  (ligature-set-ligatures
+   #'rust-mode '("&&" "||" "///" "//" "//!" "/*" "/**" "*/"
+                 ;; "::" ; too short
+                 ))
   ;; Enable all Cascadia Code ligatures in programming modes
   (ligature-set-ligatures
    'prog-mode cfg-ligature-enabled-ligatures))

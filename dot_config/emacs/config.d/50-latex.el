@@ -8,6 +8,7 @@
 ;;;###autoload
 (defun cfg-latex-setup ()
   "Setup latex mode."
+  (interactive)
   ;; also enable latex-electric if electric is enabled
   (when electric-pair-mode
     (latex-electric-env-pair-mode))
@@ -17,12 +18,14 @@
   :no-require t
   :commands olivetti-mode)
 
+;;;###autoload
 (use-package latex-mode
   :straight nil
   :mode (rx ".tex" string-end)
   :hook
   (latex-mode . cfg-latex-setup))
 
+;;;###autoload
 (use-package auctex
   :custom
   (TeX-view-program-selection

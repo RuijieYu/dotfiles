@@ -6,40 +6,11 @@
   (preload '(modus-themes)))
 
 ;;;###autoload
-(defvar cfg-themes-loaded nil "Whether a theme has been loaded.")
-
-;;;###autoload
-(defun cfg-themes-modus-load-setup ()
-  (interactive)
-  (modus-themes-with-colors
-    (custom-set-faces
-     `(fill-column-indicator
-       ((,class :background ,(modus-themes-color 'fg-alt)))))))
-
-;;;###autoload
-(add-hook 'modus-themes-after-load-theme-hook
-          #'cfg-themes-modus-load-setup)
-
-;;;###autoload
-(defun cfg-themes-modus-init-setup ()
-  (interactive)
-  (when (cfg-themes--should-enable-p)
-    (unless cfg-themes-loaded
-      (set-face-attribute 'default nil
-                          :family "JetBrains Mono"
-                          :height 136)
-      (load-theme 'modus-vivendi t)
-      (setq cfg-themes-loaded t))))
-
-;;;###autoload
 (defun cfg-themes--should-enable-p ()
   (declare (pure t)
            (side-effect-free t))
   (and (display-graphic-p)
        (version<= "28.1" emacs-version)))
-
-;;;###autoload
-(add-hook 'emacs-startup-hook #'cfg-themes-modus-init-setup)
 
 ;; ref: info `(modus-themes)Customization Options'
 ;;;###autoload
@@ -80,8 +51,38 @@
   (modus-themes-mixed-fonts t)
 
   ;; overrides
-  (modus-themes-vivendi-color-overrides '((bg-main . "#111111")))
-  (modus-themes-operandi-color-overrides '((bg-main . "#eeeeee"))))
+  ;; (modus-themes-vivendi-color-overrides '((bg-main . "#111111")))
+  ;; (modus-themes-operandi-color-overrides '((bg-main . "#eeeeee")))
+  )
+
+;;;###autoload
+(defvar cfg-themes-loaded nil "Whether a theme has been loaded.")
+
+;;;###autoload
+(defun cfg-themes-modus-load-setup ()
+  (interactive)
+  (modus-themes-with-colors
+    (custom-set-faces
+     `(fill-column-indicator
+       ((,class :background ,(modus-themes-color 'fg-alt)))))))
+
+;;;###autoload
+(add-hook 'modus-themes-after-load-theme-hook
+          #'cfg-themes-modus-load-setup)
+
+;;;###autoload
+(defun cfg-themes-modus-init-setup ()
+  (interactive)
+  (when (cfg-themes--should-enable-p)
+    (unless cfg-themes-loaded
+      (set-face-attribute 'default nil
+                          :family "JetBrains Mono"
+                          :height 136)
+      (load-theme 'modus-vivendi t)
+      (setq cfg-themes-loaded t))))
+
+;;;###autoload
+(add-hook 'emacs-startup-hook #'cfg-themes-modus-init-setup)
 
 ;;;###autoload
 (defun cfg-themes-modus-themes-toggle ()

@@ -12,12 +12,13 @@
 (defun cfg-org-setup ()
   (interactive)
   (visual-line-mode)
-  (setq-local fill-column 102)
+  (setq-local fill-column 100)
+  (display-fill-column-indicator-mode -1)
   (with-eval-after-load 'flyspell (flyspell-mode 0))
   (with-eval-after-load 'olivetti
-    (setq-local olivetti-body-width 100))
-  (require 'org-indent) (org-indent-mode)
-  (require 'org-num) (org-num-mode))
+    (setq-local olivetti-body-width fill-column))
+  (require 'org-indent) (unless org-indent-mode (org-indent-mode))
+  (require 'org-num) (unless org-num-mode (org-num-mode)))
 
 ;;;###autoload
 (defun cfg-org-src-tangle ()

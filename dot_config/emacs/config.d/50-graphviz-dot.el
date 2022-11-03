@@ -12,3 +12,7 @@
   (graphviz-dot-indent-width tab-width)
   ;; I use imv for viewing images
   (graphviz-dot-view-command "imv %s"))
+
+;;;###autoload
+(with-eval-after-load 'org
+  (cfg-org-babel-load-languages dot t))

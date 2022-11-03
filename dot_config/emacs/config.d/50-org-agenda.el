@@ -23,6 +23,15 @@ orgmode file paths."
      files)))
 
 ;;;###autoload
+(defun cfg-org-agenda-setup ()
+  (interactive)
+  (with-eval-after-load 'display-fill-column-indicator
+    (display-fill-column-indicator-mode -1)))
+
+;;;###autoload
+(add-hook 'org-agenda-finalize-hook #'cfg-org-agenda-setup)
+
+;;;###autoload
 (defun cfg-org-agenda-find (level dir)
   "Look for orgmode files under directory DIR recursively, for
 LEVEL levels.  When LEVEL is 0, simply look under the directory
@@ -51,7 +60,7 @@ orgmode file paths."
   :after org
   :custom
   (org-agenda-breadcrumbs-separator "→")
-  (org-agenda-span 'day)
+  (org-agenda-span 'fortnight)
   (org-agenda-skip-deadline-prewarning-if-scheduled t)
   (org-agenda-files
    (cl-remove-if-not

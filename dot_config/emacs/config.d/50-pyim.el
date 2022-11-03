@@ -51,6 +51,7 @@
     "=" (lambda () (interactive) (pyim-select-word-by-number 12))))
 
 ;; Start pyim IME via M-j
+;;;###autoload
 (define-keymap :keymap (current-global-map)
   "M-j" #'pyim-convert-string-at-point)
 

@@ -12,6 +12,7 @@
 
 ;;;###autoload
 (use-package electric
+  :disabled
   :straight nil
   :commands electric-quote-local-mode
   :hook (after-init . electric-quote-mode))

@@ -18,6 +18,7 @@
   (lsp-deferred)
   ;; (lsp-semantic-tokens-mode)
   (hl-line-mode)
+  (electric-pair-local-mode)
   (setq-local fill-column 80))
 
 ;;;###autoload
@@ -54,7 +55,7 @@
   ;; inlay hints
   (lsp-rust-analyzer-inlay-hints-mode t)
   (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-analyzer-max-inlay-hint-length 25)
+  (lsp-rust-analyzer-max-inlay-hint-length 40)
   (lsp-rust-analyzer-display-reborrow-hints "always")
   (lsp-rust-analyzer-display-chaining-hints t)
   (lsp-rust-analyzer-display-parameter-hints t)
@@ -62,13 +63,15 @@
   (lsp-rust-analyzer-closing-brace-hints t)
   (lsp-rust-analyzer-display-closure-return-type-hints nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "always")
-  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names t)
-  :config
-  (define-keymap :keymap lsp-mode-map
-    "C-c" lsp-rust-ctrl-c-map))
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names t))
 
 ;;;###autoload
-(defvar-keymap lsp-rust-ctrl-c-map
+(with-eval-after-load 'esh-var
+  ;; eshell is able to display colors
+  (cfg-eshell-export "CARGO_TERM_COLOR" "always"))
+
+;;;###autoload
+(defvar-keymap cfg-lsp-rust-ctrl-c-map
   :doc "Custom keymap under \"C-c l C-c\"."
   ;; move item up or down
   "p" #'lsp-rust-analyzer-move-item-up
@@ -81,6 +84,11 @@
   "?" #'lsp-rust-analyzer-status
   "r" #'lsp-rust-analyzer-reload-workspace
   "t" #'lsp-make-rust-analyzer-view-item-tree)
+
+;;;###autoload
+(with-eval-after-load 'lsp-rust
+  (define-keymap :keymap lsp-mode-map
+    "C-c l C-c" cfg-lsp-rust-ctrl-c-map))
 
 ;; TODO: allow overrides for formatting (toolchain)
 
@@ -118,4 +126,3 @@ The documentation is built if necessary.")
              (format "%s doc %s %s --open" bin
                      (if priv "--document-private-items" "")
                      (if dep "--no-deps" "")))))))))
-

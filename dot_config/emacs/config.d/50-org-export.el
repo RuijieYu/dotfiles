@@ -23,7 +23,11 @@ recognizing nil or ’cref.")
   :demand t
   :defines org-latex-minted-langs
   :custom
+  ;; which latex engine to use
   (org-latex-compiler "xelatex")
+  ;; how are quotes displayed
+  (org-latex-default-quote-environment "quotation")
+  ;; use colorized code blocks
   (org-latex-src-block-backend 'minted)
   (org-latex-hyperref-template
    ;; slightly modified from default

@@ -27,10 +27,10 @@
 
 ;;;###autoload
 (defconst cfg-lisp-insert-allowed-operators
-  '(([?= ?=] . "eql") ([?!] . "not")
+  '(([?=] . "eql") ([?!] . "not")
     ([?&] . "and") ([?|] . "or") ([?^] . "xor")
-    ([?= ?+] . "+") ([?= ?-] . "-")
-    ([?= ?*] . "*") ([?= ?/] . "/") ([?= ?%] . "mod"))
+    ([?+] . "+") ([?-] . "-")
+    ([?*] . "*") ([?/] . "/") ([?%] . "mod"))
   "An alist whose keys are single characters to their corresponding
 function names.")
 
@@ -39,6 +39,7 @@ function names.")
   "Insert an operator name.  See `cfg-lisp-insert-allowed-operators’
 for the list of allowed operators."
   (interactive)
+  (lispy--remember)
   (let* ((key (or key (this-single-command-keys)))
          (fname (cdr-safe
                  (assoc key cfg-lisp-insert-allowed-operators)))
@@ -88,15 +89,40 @@ for the list of allowed operators."
       (backward-char)
       (funcall act-atom))
      ;; otherwise insert self
-     (t (mapc #'insert kbd)))))
+     (t (mapc #'insert key)))))
+
+;;;###autoload
+(defun cfg-keymap-lookup-single (keymap key)
+  (and (keymapp keymap) key
+       (cl-do ((map (cdr keymap) (cdr map))
+               (sub nil
+                    (let ((map (car map)))
+                      (or (and (keymapp map)
+                               (cfg-keymap-lookup-single map key))
+                          (and (eql key (car map))
+                               (cdr map))))))
+           ((or sub (not map)) sub))))
+
+;;;###autoload
+(defun cfg-keymap-lookup-vector (keymap key)
+  (and (keymapp keymap) key
+       (cond ((key-valid-p key) (keymap-lookup keymap key))
+             ((or (stringp key) (vector-or-char-table-p key))
+              (let ((max (length key)))
+                (cl-do ((idx 0 (1+ idx))
+                        (map keymap
+                             (cfg-keymap-lookup-single
+                              map (aref key idx))))
+                    ((or (not map) (>= idx max)) map)))))))
 
 ;; for simplicity, add the keymap directly at `lispy-mode-map’.
 ;;;###autoload
 (with-eval-after-load 'lispy
-  (define-keymap :keymap lispy-mode-map
-    "=" (define-keymap))
   (dolist (key (mapcar #'car cfg-lisp-insert-allowed-operators))
-    (define-key lispy-mode-map key #'cfg-lisp-insert-operators)))
+    (let ((old (cfg-keymap-lookup-vector lispy-mode key)))
+      (lispy-define-key lispy-mode-map
+          (concat key) #'cfg-lisp-insert-operators
+        :inserter old))))
 
 ;;;###autoload
 (defun cfg-lisp-insert-lambda ()
@@ -134,6 +160,7 @@ otherwise insert \"lambda\" string."
   :defines lisp-mode-map)
 
 ;; lispy mode
+;;;###autoload
 (use-package lispy
   :after lisp-mode
   :commands lispy-mode

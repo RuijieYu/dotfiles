@@ -40,7 +40,7 @@
   (company-etags-ignore-case t)
   (company-idle-delay 9999)
   (company-keywords-ignore-case t)
-  (company-lighter-base "cmp")
+  (company-lighter-base "C")
   (company-require-match nil)
   (company-show-quick-access t))
 
@@ -57,7 +57,7 @@
 ;;;###autoload
 (use-package company-box
   :after diminish
-  :diminish "cb"
+  :diminish
   :commands company-box-mode)
 
 ;;* define keymaps
