@@ -1,10 +1,14 @@
+found distcc || return
+
 # distcc
-__use_distcc() {
-    _prepend_path /usr/lib/distcc/bin
-    
-    # [[ "$PATH" =~ '.*distcc.*' ]] ||
-    # export PATH="/usr/lib/distcc/bin:$PATH"
-    
-    export DISTCC_HOSTS="$DISTCC_HOSTS"
-    export DISTCC_VERBOSE="$DISTCC_VERBOSE"
+enable_distcc() {
+    prepend_path PATH /usr/lib/distcc/bin
+
+    export DISTCC_HOSTS DISTCC_VERBOSE
+}
+
+disable_distcc () {
+    remove_from_path PATH /usr/lib/distcc/bin
+
+    typeset +x DISTCC_HOSTS DISTCC_VERBOSE
 }

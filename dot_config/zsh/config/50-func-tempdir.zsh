@@ -1,1 +1,1 @@
-tempdir() { cd "$(mktemp -d)" ; }
+tempdir() pushd -q "$(mktemp -d)"

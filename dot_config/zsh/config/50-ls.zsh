@@ -1,5 +1,7 @@
-# colorized ls
-alias ls='ls --color=auto'
+# TODO: how to find historic "ls"? or does this matter in my
+# setup?
 
-test gls &>/dev/null &&
-    alias gls='gls --color=auto'
+# colorized ls for each variant (gls from homebrew)
+for ls in ls gls; do
+    found "$ls" && alias "$ls=$ls --color=auto"
+done

@@ -1,4 +1,8 @@
+# when emerge is found (gentoo and derivatives) and running as
+# non-root user, *pretend* because the user cannot modify anything
+# anyways.
+found emerge || return
+test "$USER" = root || return
+
 # alias emerge to pretend
-{ type emerge &>/dev/null &&
-      test "$USER" = root
-} || alias emerge='emerge --pretend --verbose'
+alias emerge='emerge --pretend --verbose'

@@ -1,12 +1,6 @@
 # get the environment variables of a certain PID
-_tr() {
-    tr '\0' '\n'
-}
+tr_nl() tr '\0' '\n'
 
-envof() {
-    _tr < "/proc/$1/environ"
-}
+envof() tr_nl <"/proc/$1/environ"
 
-cmdof() {
-    _tr < "/proc/$1/cmdline"
-}
+cmdof() tr_nl <"/proc/$1/cmdline"
