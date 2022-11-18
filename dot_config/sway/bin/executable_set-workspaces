@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# example here, overriden by workspaces.sh:
+names=(
+    1:dev
+    4:browse
+    7:mail
+)
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/sway"
+WORKSPACES_SH="$CONFIG_DIR/workspaces.sh"
+test -r "$WORKSPACES_SH" && . "$WORKSPACES_SH"
+
+_swaymsg() { swaymsg "$@"; } >/dev/null
+
+# first set blanket definitions with numbers
+for i in {1..12}; do
+    _swaymsg set "\$ws$i" "$i"
+    _swaymsg set "\$ws$((100 + i))" "$((100 + i))"
+done
+
+# then go over names and set names
+for name in "${names[@]}"; do
+    num="$(cut -d: -f1 <<<"$name")"
+    desc="$(cut -d: -f2- <<<"$name")"
+    _swaymsg set "\$ws$num" "$name"
+    _swaymsg set "\$ws$((100 + num))" "$((100 + num)):$desc"
+done
+
+# update workspace names for current sway session
+"$CONFIG_DIR/bin/workspace-update-names" \
+    1 12 \
+    101 112
