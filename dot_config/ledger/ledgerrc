@@ -1,0 +1,38 @@
+# -*- mode: conf-space; -*-
+
+# set input format, usually CSV files from US banks contain dates
+# of this format
+--input-date-format %m/%d/%Y
+
+# set output format, I like looking at this format
+--date-format %Y-%m-%d
+
+# the main ledger file
+--file ~/finance/finance.ledger
+
+# when importing CSV files, add additional metadata to ledger file
+--rich-data
+
+# do not show virtual transactions (as opposed to --real not
+# accounting for virtual transactions)
+--actual
+
+# maybe color
+--color
+
+# merge postings by payees (headlines)
+# --by-payee
+
+# sort by date
+--sort date
+
+# strict and strict-payee; pedantic to make them errors
+--strict
+# --check-payees
+# --pedantic
+
+# This does not work with emacs `ledger-mode'
+# --dc
+
+# display time values more naturally
+--time-colon
