@@ -106,3 +106,10 @@
 	autoStash = true
 [merge]
 	conflictstyle = diff3
+
+{{ if (eq .ghuser "") }}
+# github user section disabled
+{{ else }}
+[github]
+	user = {{ .ghuser }}
+{{ end }}
