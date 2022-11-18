@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# export BROWSER=qutebrowser
+exec /usr/bin/sway "$@"

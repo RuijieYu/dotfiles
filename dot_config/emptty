@@ -1,0 +1,3 @@
+Name=Sway
+Exec=/usr/bin/sway
+Environment=wayland
