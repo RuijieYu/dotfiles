@@ -122,7 +122,9 @@ for the list of allowed operators."
     (let ((old (cfg-keymap-lookup-vector lispy-mode key)))
       (lispy-define-key lispy-mode-map
           (concat key) #'cfg-lisp-insert-operators
-        :inserter old))))
+        :inserter old)))
+  ;; `special-lispy-splice' has been overriden
+  (lispy-define-key lispy-mode-map "\\" #'lispy-splice))
 
 ;;;###autoload
 (defun cfg-lisp-insert-lambda ()
