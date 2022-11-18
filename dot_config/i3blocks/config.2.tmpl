@@ -6,9 +6,9 @@
 #     https://vivien.github.io/i3blocks
 
 # i3blocks-contrib scripts here
+## unfortunately cannot add custom variable names
 SCRIPT_DIR=/usr/lib/i3blocks
-LOCAL_SCRIPT=/home/ruijie/.local/bin
-
+{{ $local_scripts := "~/.local/lib/i3blocks" }}
 # Global properties
 separator=true
 separator_block_width=12
@@ -28,8 +28,8 @@ REFRESH_TIME=5
 LABEL=C
 
 [memory]
-command=$LOCAL_SCRIPT/memory
-label=M 
+command={{- $local_scripts -}}/memory
+label=M
 instance=mem
 interval=15
 

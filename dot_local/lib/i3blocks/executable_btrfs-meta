@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+#
+# Print the result of (used) / (total - 500MiB) as percentage; yellow if less
+# than 5% or 50MiB available, red if less than 1% or 10MiB available.
+#
+# Dependencies: sh, btrfs, /usr/bin/python3
+
+BTRFS="${BTRFS:-$1}"
+BTRFS="${BTRFS:-/}"
+
+export WARN_COLOR="${WARN_COLOR:-#ffff32}"
+export WARN_PERC="${WARN_PERC:-5}"
+export WARN_FLAT="${WARN_FLAT:50MiB}"
+
+export CRIT_COLOR="${CRIT_COLOR:-#ff3232}"
+export CRIT_PERC="${CRIT_PERC:-1}"
+export CRIT_FLAT="${CRIT_FLAT:10MiB}"
+
+# expected line:
+# Metadata, DUP: total=8.00GiB, used=6.32GiB
+
+# get filesystem stats
+/usr/bin/btrfs filesystem df "$BTRFS" |
+    # get first line for "Metadata,"
+    /usr/bin/grep -m1 "^Metadata," |
+    /usr/bin/grep -Poe '(?<==)\d*(\.\d*)?([KMGTP]i)?B' |
+    /usr/bin/python3 "$0.py"

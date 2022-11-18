@@ -1,0 +1,26 @@
+#!/bin/sh
+
+AUDIO_SYMBOL="${AUDIO_SYMBOL-♯}"
+
+# volume: 40%
+# volume:100%
+# _VOL="$(mpc volume | awk '/^vol/ { print $2 }')"
+_vol="$(mpc volume |
+            sed -n '/^vol/{s/volume:\s*//;p;q}')"
+
+# FULL format
+echo "$AUDIO_SYMBOL" "$_vol"
+
+# SHORT foramt
+echo "$AUDIO_SYMBOL$_vol"
+
+# FORGROUND COLOR
+echo "$_vol" |
+    awk -F% ' {
+    if ($1 >= 50) { print "#ffffff" }
+    else if ($1 >= 20) { print "#ffff32" }
+    else if ($1 >= 0) { print "#ffac32" }
+    else { print "#ff3232" }
+} '
+
+# background, none

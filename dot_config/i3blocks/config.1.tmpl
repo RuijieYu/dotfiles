@@ -6,27 +6,19 @@
 #     https://vivien.github.io/i3blocks
 
 # i3blocks-contrib scripts here
+## unfortunately cannot add custom variable names
 SCRIPT_DIR=/usr/lib/i3blocks
-
+{{ $local_scripts := "~/.local/lib/i3blocks" }}
 # Global properties
 separator=true
 separator_block_width=16
 markup=pango
-
-# [systemd/u/emacs]
-# command=$SCRIPT_DIR/systemd_unit
-# markup=pango
-# label=emacs:
-# interval=5
-# UNIT_NAME=emacs.service
-# USER_UNIT=true
 
 [mediaplayer]
 command=$SCRIPT_DIR/mediaplayer
 instance=mpd
 interval=30
 signal=2
-# MPC_FORMAT=[[[%composer%|%performer%|%artist%]#|%title%]]|[%file%]
 
 [backlight]
 command=$SCRIPT_DIR/backlight
@@ -41,14 +33,19 @@ DIR=/
 ALERT_LOW=10
 interval=60
 
+[btrfs-meta]
+command={{- $local_scripts -}}/btrfs-meta
+interval=1
+BTRFS=/
+
 [mpc-volume*]
-command=~/.local/bin/mpc-volume
+command={{- $local_scripts -}}/mpc-volume
 interval=once
 signal=2
 
 [volume-pipewire*]
 # command=$SCRIPT_DIR/volume-pipewire
-command=~/.local/bin/volume-pipewire
+command={{- $local_scripts -}}/volume-pipewire
 interval=once
 signal=1
 AUDIO_HIGH_SYMBOL=
@@ -60,7 +57,7 @@ SHORT_FORMAT="${SYMB} ${VOL}%"
 MUTED_COLOR="#cc0000"
 
 [miccontrol*]
-command=~/.local/bin/miccontrol
+command={{- $local_scripts -}}/miccontrol
 interval=once
 signal=3
 SOURCE=40
@@ -83,18 +80,20 @@ command=$SCRIPT_DIR/openvpn-systemd
 interval=10
 label=V 
 
-[iface.tun0]
-command=$SCRIPT_DIR/iface
+[iface.tun?{0}]
+command={{- $local_scripts -}}/iface
 LABEL=
-IFACE=tun0
-color=#00FF00
+IFACE=tun?
+SELECT=0
+color=#7777FF
 interval=10
 
-[iface.tun1]
-command=$SCRIPT_DIR/iface
+[iface.tun?{1}]
+command={{- $local_scripts -}}/iface
 LABEL=
-IFACE=tun1
-color=#00FF00
+IFACE=tun?
+SELECT=1
+color=#7777FF
 interval=10
 
 [ssid]
@@ -102,11 +101,20 @@ command=$SCRIPT_DIR/ssid
 interval=10
 INTERFACE=wlan0
 
-[iface.wlan0]
-command=$SCRIPT_DIR/iface
+[iface.wlan?{0}]
+command={{- $local_scripts -}}/iface
 LABEL=
 IFACE=wlan0
+SELECT=0
 color=#00FF00
+interval=10
+
+[iface.en*{0}]
+command={{- $local_scripts -}}/iface
+LABEL=
+IFACE=en*
+SELECT=0
+color=#cc32cc
 interval=10
 
 [dunst]
@@ -117,5 +125,5 @@ format=json
 [time1]
 command=date '+%a %FT%T-%Z'
 TZ={{- .time1 }}
-color=#028548
+color=#02ca48
 interval=1
