@@ -21,6 +21,8 @@ directories) under DIR are parsed for autoloads."
       (require 'autoload)
       (message "Generating autoloads: \"%s\" → \"%s\"..."
                dir autoload)
+      (let ((autoload-dir (file-name-directory autoload)))
+        (make-directory autoload-dir 'parents))
       (make-directory-autoloads dir autoload)
       (message "Generating autoloads: \"%s\" → \"%s\"...done"
                dir autoload)
