@@ -4,4 +4,24 @@ found pyenv && {
 
     eval "$(pyenv init --path zsh)"
     eval "$(pyenv init -)"
+
+    found fzf && {
+        _sel_ver() {
+            fzf --tiebreak=index \
+                --tac \
+                --height "${FZF_TMUX_HEIGHT:-~40%}" "$@" |
+                awk '{$1=$1};1'
+        }
+
+        pyver() {
+            # ref: https://unix.stackexchange.com/a/205854
+            local ver="$(pyenv versions | _sel_ver)"
+            test -z "$ver" || pyenv shell "$ver"
+        }
+
+        pyinstall() {
+            local vers=($(pyenv install -l | _sel_ver -m))
+            pyenv install "$@" ${vers[@]}
+        }
+    }
 }
