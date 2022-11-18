@@ -64,8 +64,9 @@ config.set('content.cookies.accept', 'all', 'devtools://*')
 # Value to send in the `Accept-Language` header. Note that the value
 # read from JavaScript is always the global value.
 # Type: String
-config.set('content.headers.accept_language', '',
-           'https://matchmaker.krunker.io/*')
+config.set(
+    'content.headers.accept_language', '', 'https://matchmaker.krunker.io/*'
+)
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -84,7 +85,8 @@ config.set('content.headers.accept_language', '',
 config.set(
     'content.headers.user_agent',
     'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}',
-    'https://web.whatsapp.com/')
+    'https://web.whatsapp.com/'
+)
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -100,9 +102,11 @@ config.set(
 # between 5.12 and 5.14 (inclusive), changing the value exposed to
 # JavaScript requires a restart.
 # Type: FormatString
-config.set('content.headers.user_agent',
-           'Mozilla/5.0 ({os_info}; rv:90.0) Gecko/20100101 Firefox/90.0',
-           'https://accounts.google.com/*')
+config.set(
+    'content.headers.user_agent',
+    'Mozilla/5.0 ({os_info}; rv:90.0) Gecko/20100101 Firefox/90.0',
+    'https://accounts.google.com/*'
+)
 
 # User agent to send.  The following placeholders are defined:  *
 # `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
@@ -121,7 +125,8 @@ config.set('content.headers.user_agent',
 config.set(
     'content.headers.user_agent',
     'Mozilla/5.0 ({os_info}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99 Safari/537.36',
-    'https://*.slack.com/*')
+    'https://*.slack.com/*'
+)
 
 # Load images automatically in web pages.
 # Type: Bool
@@ -154,6 +159,10 @@ config.get('url.searchengines').update({
     'https://github.com/search?q={}',
     'cpp':
     'https://duckduckgo.com/?sites=cppreference.com&q={}',
+    'crates':
+    'https://crates.io/search?q={}',
+    'crates=':
+    'https://crates.io/crates/{}',
     # arch
     'arch':
     'https://wiki.archlinux.org/?search={}',
@@ -163,6 +172,8 @@ config.get('url.searchengines').update({
     'https://aur.archlinux.org/packages/?K={}',
     'aur=':
     'https://aur.archlinux.org/packages/{}',
+    'pkg':
+    'https://archlinux.org/packages/?q={}',
     # dictionary
     'mw':
     'https://merriam-webster.com/dictionary/{}',
@@ -181,7 +192,7 @@ config.set('tabs.tabs_are_windows', True)
 from os import environ as env
 
 
-def _emacsclient_command():
+def _emacsclient_command() -> list[str]:
     'Return the command line arguments used for invoking `emacsclient`.'
     from pathlib import Path
     from typing import Optional
@@ -189,7 +200,7 @@ def _emacsclient_command():
                            or '~/.local/run').expanduser()
     emacs_daemon_dir = xdg_runtime_dir / 'emacs'
 
-    def _construct_emacsclient(daemon: Optional[Path] = None):
+    def _construct_emacsclient(daemon: Optional[Path] = None) -> list[str]:
         'daemon is an absolute path for the emacs daemon socket.'
         return [
             'emacsclient',
@@ -204,7 +215,8 @@ def _emacsclient_command():
         # look for the first socket
         first_socket = next(
             (file for file in emacs_daemon_dir.iterdir() if file.is_socket()),
-            None)
+            None
+        )
         return _construct_emacsclient(first_socket)
     except FileNotFoundError:
         pass  # directory does not exist
@@ -227,14 +239,19 @@ def _get_dmenu():
 def _qute_pass(arg='', *, dmenu=None):
     dmenu = dmenu or _get_dmenu()
 
-    env.setdefault('PASSWORD_STORE_DIR', (f'{env["HOME"]}/'
-                                          '.local/share/'
-                                          'pass/password-store'))
+    env.setdefault(
+        'PASSWORD_STORE_DIR',
+        (f'{env["HOME"]}/'
+         '.local/share/'
+         'pass/password-store')
+    )
 
-    return ('spawn --userscript qute-pass '
-            f'-d "{dmenu}" '
-            f'-p "{env["PASSWORD_STORE_DIR"]}" '
-            f'{arg}')
+    return (
+        'spawn --userscript qute-pass '
+        f'-d "{dmenu}" '
+        f'-p "{env["PASSWORD_STORE_DIR"]}" '
+        f'{arg}'
+    )
 
 
 for mode in ('normal', 'insert', 'prompt'):
@@ -245,5 +262,14 @@ for mode in ('normal', 'insert', 'prompt'):
     config.bind('<Ctrl-P>', _qute_pass('--password-only'), mode=mode)
     config.bind('<Ctrl-O>', _qute_pass('--otp-only'), mode=mode)
 
-# reload config easily with alt-f5
-config.bind('<Alt-F5>', 'config-source')
+# reload config easily with alt-f5 for most modes
+for mode in ('normal', 'insert', 'passthrough'):
+    config.bind('<Alt-F5>', 'config-source', mode=mode)
+
+# pass through refresh
+for mode in ('passthrough',):
+    config.bind('<Ctrl-R>', 'reload', mode=mode)
+    config.bind('<F5>', 'reload', mode=mode)
+
+# allow JS clipboard access
+config.set('content.javascript.can_access_clipboard', True)
