@@ -17,17 +17,19 @@ __podman_installed() { found podman; }
 
 __docker_installed() { found docker && ! __docker_is_podman; }
 
+__sudo() { sudo $(sudo -Av && echo -A) "$@"; }
+
 docker() {
     if __docker_installed; then
         # docker is installed
-        sudo -A =docker "$@"
+        __sudo =docker "$@"
     elif __docker_is_podman; then
         # docker is alias for podman
         local arg1="$1"
         shift
         case "$arg1" in
-        compose) sudo -A ="podman-$arg1" "$@" ;;
-        *) sudo -A =podman "$arg1" "$@" ;;
+        compose) __sudo ="podman-$arg1" "$@" ;;
+        *) __sudo =podman "$arg1" "$@" ;;
         esac
     else
         # docker not installed
