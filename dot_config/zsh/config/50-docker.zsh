@@ -17,7 +17,11 @@ __podman_installed() { found podman; }
 
 __docker_installed() { found docker && ! __docker_is_podman; }
 
-__sudo() { sudo $(sudo -Av && echo -A) "$@"; }
+__sudo() {
+    if test root = "$USER"; then "$@"; else
+        sudo $(sudo -Av && echo -A) "$@"
+    fi
+}
 
 docker() {
     if __docker_installed; then
