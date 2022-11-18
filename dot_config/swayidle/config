@@ -1,0 +1,10 @@
+# lock and unlock
+lock swaylock
+unlock true
+
+# sleep and resume
+before-sleep 'swaymsg "output * dpms off"'
+after-resume 'swaymsg "output * dpms on"'
+
+# number of seconds for systemd idle
+idlehint 300
