@@ -1,0 +1,33 @@
+#!/bin/sh
+FILTER='recurse(.nodes[]?, .floating_nodes[]?) | select(.focused?)'
+
+focused() {
+    swaymsg -t get_tree | jq "$@" "$FILTER"
+}
+
+compact_node () {
+    ## generic:
+    # id, type, orientation, percent, urgent, mark, focused, layout, border,
+    # current_border_width, rect, deco_rect, window_rect, geometry, name,
+    # window, nodes, floating_nodes, focus, fullscreen_mode, sticky, pid,
+    # app_id, visible, max_render_time, shell, inhibit_idle, idle_inhibitors
+    ## xwayland:
+    # window_properties[class, instance, title, transient_for, window_type]
+    jq -c '{
+        "is_float": (.type == "floating_con"),
+        "name": .name,
+        "fullscreen_mode": .fullscreen_mode,
+        "sticky": .sticky,
+        "pid": .pid,
+        "app_id": .app_id,
+        "shell": (if "xwayland" == .shell then "xwayland" else "xdg_shell" end),
+        "window_properties": .window_properties?
+    }'
+}
+
+# when called from keybind, stdout is unset
+# otherwise we just print
+case "$(readlink /proc/$$/fd/1)" in
+/dev/null) notify-send 'Focused node' "$(focused | compact_node)" ;;
+*) focused ;;
+esac
