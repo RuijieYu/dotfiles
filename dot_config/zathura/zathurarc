@@ -1,5 +1,0 @@
-set recolor-lightcolor "#323232"
-
-map <C-i> set recolor
-
-set font "Jetbrains Mono"
