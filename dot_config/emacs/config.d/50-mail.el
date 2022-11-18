@@ -98,6 +98,7 @@ URL
             mu4e-headers-mode-map)
   :custom
   (mu4e-get-mail-command "mbsync -a")
+  (mu4e-change-filenames-when-moving t)
   ;; align with server settings
   (mu4e-sent-folder "/Sent")
   (mu4e-drafts-folder "/Drafts")
