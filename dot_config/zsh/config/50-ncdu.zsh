@@ -1,4 +1,4 @@
-# does nothing when ncdu or ncdu2 are not found
+# does nothing when both ncdu and ncdu2 not found
 found ncdu && ncdu=ncdu
 found ncdu2 && ncdu=ncdu2
 test -z "$ncdu" && return
@@ -9,7 +9,8 @@ ncdu_excludes=(
 )
 
 ncdu_excl_flags=(
-    --exclude-kernfs
+    # according to ncdu, this flag only available for linux
+    $(test Linux != "$(uname -s)" || echo --exclude-kernfs)
     $(for ex in "${ncdu_excludes[@]}"; do
         echo --exclude "$ex"
     done)
