@@ -33,7 +33,7 @@ __extended_run_help() {
         else
             "$cmd" --help | __help_capture
         fi ;;
-    rustup | cargo) # where both $cmd and $cmd $sub need capture
+    rustup | cargo | chezmoi) # where both $cmd and $cmd $sub need capture
         if test -n "$subcmd"; then
             "$cmd" "$subcmd" --help
         else
