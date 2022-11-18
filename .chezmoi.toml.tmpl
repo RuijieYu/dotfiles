@@ -90,4 +90,12 @@
     {{-   $font = (promptString "primary font name" "JetBrains Mono") -}}
     {{- end -}}
     font = {{ $font | quote }}
-    
+
+    # git config github section
+    {{ $ghuser := "" -}}
+    {{- if(hasKey . "ghuser") -}}
+    {{-   $ghuser = .ghuser -}}
+    {{- else -}}
+    {{-   $ghuser = (promptString "GitHub Username") -}}
+    {{- end -}}
+    ghuser = {{ $ghuser | quote }}
