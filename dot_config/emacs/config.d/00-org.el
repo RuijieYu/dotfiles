@@ -35,6 +35,7 @@ tangled."
 ;;;###autoload
 (add-hook 'org-mode-hook #'cfg-org-setup)
 
+;;;###autoload
 ;; orgmode TODO: take inspiration from
 ;; https://github.com/ymherklotz/dotfiles/blob/master/emacs/loader.org
 (use-package org
@@ -100,6 +101,7 @@ tangled."
     "C-<tab> l" #'org-agenda-list))
 
 ;;* org-src
+;;;###autoload
 (use-package org-src
   :straight org
   :defines org-src-mode
@@ -116,6 +118,7 @@ tangled."
     "C-c C-v t" #'cfg--org-src-tangle))
 
 ;;* org-babel
+;;;###autoload
 (use-package ob-tangle
   :straight org
   :commands org-babel-tangle)
