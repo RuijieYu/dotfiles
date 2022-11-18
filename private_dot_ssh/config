@@ -1,19 +1,1 @@
-# global options
-
-# multiplexing connections
-ControlMaster auto
-ControlPath ${XDG_RUNTIME_DIR}/.ssh.%r@%h:%p.sock
-ControlPersist yes
-
-# set identity file
-IdentityFile ~/.ssh/%r@%h
-IdentitiesOnly yes
-
 Include ~/.ssh/config.d/*.conf
-
-# some default usernames
-Host github.com
-     User git
-
-Host aur.archlinux.org
-     User aur

@@ -1,0 +1,6 @@
+{{- if(eq .chezmoi.os "darwin") -}}
+# on macOS, use keychain
+Host *
+     UseKeychain yes
+     AddKeysToAgent yes
+{{- end -}}
