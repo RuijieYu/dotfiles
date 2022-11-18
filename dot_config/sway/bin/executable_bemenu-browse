@@ -2,13 +2,15 @@
 
 # options:
 # -p, --private: add -p flag for qutebrowser :open
-
+#
 # -c, --clip[=TARGET]: use clipboard as query.  TARGET should be
 # -from default, primary, secondary, clip, default being
 # -'default'.  'default' is to specify nothing; 'primary' is to
 # -use primary selection, 'secondary' is to use secondary
 # -selection on X11, and primary on wayland; 'clip' is to use
 # -clipboard.
+#
+# -w, --window: just open a window
 
 readonly SCRIPTDIR="$(dirname "$0")"
 export PATH="$SCRIPTDIR:$HOME/.local/bin:$PATH"
@@ -17,7 +19,7 @@ window=-w # always new window
 prompt=browse
 
 eval set -- \
-	"$(getopt -ohpc:: -l help,private,clip:: -- "$@")"
+	"$(getopt -ohwpc:: -l help,window,private,clip:: -- "$@")"
 
 print_help() {
 	local prog="$(basename "$0")"
@@ -39,10 +41,12 @@ print_help() {
 	exit
 }
 
+do_browse=
 private=
 clip=
 while true; do
 	case "$1" in
+	--window | -w) do_browse=1 ;;
 	--help | -h) print_help ;;
 	--private | -p) private=1 ;;
 	--clip | -c)
@@ -56,6 +60,15 @@ while true; do
 	esac
 	shift
 done
+
+# wrapper for browser
+browse() { qutebrowser -R "$@"; }
+
+# when -w, just open a browser window
+test -n "$do_browse" && {
+	if test -z "$private"; then browse; else browse ':open -p'; fi
+	exit
+}
 
 test -n "$private" && {
 	window=-p
@@ -120,7 +133,7 @@ test -z "$args" && exit 0
 # force https (because why not)
 https=-s
 
-qutebrowser ":open $window $https $args"
+browse ":open $window $https $args"
 
 # TODO: I noticed that running `qutebrowser 'query or url'` works
 # mostly as intended.  The only difference is that the open flag
