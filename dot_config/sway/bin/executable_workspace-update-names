@@ -6,9 +6,9 @@ test $# -lt 2 && set -- 1 10
 
 while test $# -ge 2; do
     for i in $(seq "$1" "$2"); do
-        swaymsg rename workspace \
-            number "$i" to \
-            "\$ws$i"
+        swaymsg rename \
+            workspace number "$i" \
+            to "\$ws$i"
     done
     shift 2
 done &>/dev/null
