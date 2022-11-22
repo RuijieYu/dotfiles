@@ -28,7 +28,10 @@
   :commands (rustic-cargo-bin
              rustic-mode)
   :hook
-  (rust-mode . cfg-rust-setup))
+  (rust-mode . cfg-rust-setup)
+  :config
+  (define-remap rustic-mode-map
+    [remap rustic-racer-describe] #'cfg-noop))
 
 ;; the other package "toml" is for reading data from .toml files
 ;;;###autoload
