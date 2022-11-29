@@ -57,7 +57,6 @@ docker-compose-restart() {
         up=(up --pull=always --build --remove-orphans --detach --wait $UP_ARGS)
 
     (
-        export TERM=dumb
         __sudo -v
 
         (
@@ -66,8 +65,7 @@ docker-compose-restart() {
                 docker "${compose[@]}" "${down[@]}" | cat &
             done
             wait
-        ) &
-        wait $!
+        )
 
         (
             for projdir in "${projs[@]}"; do
@@ -75,7 +73,6 @@ docker-compose-restart() {
                 docker "${compose[@]}" "${up[@]}" | cat &
             done
             wait
-        ) &
-        wait $!
+        )
     )
 }
