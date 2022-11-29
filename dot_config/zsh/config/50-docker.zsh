@@ -18,9 +18,11 @@ __podman_installed() { found podman; }
 __docker_installed() { found docker && ! __docker_is_podman; }
 
 __sudo() {
-    if test root = "$USER"; then "$@"; else
-        sudo $(sudo -Av && echo -A) "$@"
-    fi
+    case "$USER!$1" in
+    root!-v) ;;
+    root!*) "$@" ;;
+    *) sudo $(sudo -Av && echo -A) "$@" ;;
+    esac
 }
 
 docker() {
@@ -45,3 +47,35 @@ if __docker_is_podman; then
     # when docker is an alias of podman
     compdef docker=podman
 fi
+
+docker-compose-restart() {
+    local projdir compose \
+        projs=($(print -l "$@" | sort | uniq | while read projdir; do
+            test -r "$projdir/docker-compose.yml" && echo "$projdir"
+        done)) \
+        down=(down $DOWN_ARGS) \
+        up=(up --pull=always --build --remove-orphans --detach --wait $UP_ARGS)
+
+    (
+        export TERM=dumb
+        __sudo -v
+
+        (
+            for projdir in "${projs[@]}"; do
+                compose=(compose --project-directory="$projdir" $COMPOSE_ARGS)
+                docker "${compose[@]}" "${down[@]}" | cat &
+            done
+            wait
+        ) &
+        wait $!
+
+        (
+            for projdir in "${projs[@]}"; do
+                compose=(compose --project-directory="$projdir" $COMPOSE_ARGS)
+                docker "${compose[@]}" "${up[@]}" | cat &
+            done
+            wait
+        ) &
+        wait $!
+    )
+}
