@@ -32,11 +32,31 @@
         "/usr/"))
 
 ;;;###autoload
-(use-package lsp-pyls
+(use-package lsp-pylsp
   :no-require t
   :straight lsp-mode
   :after python
   :custom
+  (lsp-pylsp-server-command '("pylsp"))
+  ;; completion system
+  (lsp-pylsp-plugins-jedi-completion-enabled t)
+  (lsp-pylsp-plugins-jedi-definition-enabled t)
+  (lsp-pylsp-plugins-jedi-hover-enabled t)
+  (lsp-pylsp-plugins-jedi-references-enabled t)
+  (lsp-pylsp-plugins-jedi-signature-help-enabled t)
+  (lsp-pylsp-plugins-jedi-symbols-enabled t)
+  ;; enable lints
+  (lsp-pylsp-plugins-pylint-enabled t)
+  ;; enable formatter
+  (lsp-pylsp-plugins-yapf-enabled t)
+  (lsp-pylsp-plugins-autopep8-enabled nil)
+  (lsp-pylsp-plugins-flake8-enabled nil)
+  ;; misc
+  (lsp-pylsp-plugins-mccabe-enabled nil) ; ?
+  (lsp-pylsp-plugins-preload-enabled t)
+  (lsp-pylsp-plugins-pycodestyle-enabled t)
+  (lsp-pylsp-plugins-pydocstyle-enabled t)
+  (lsp-pylsp-plugins-pyflakes-enabled t)
   (lsp-clients-python-library-directories
    cfg-python--lsp-pyls-libs)
   (lsp-clients-pylsp-library-directories
