@@ -20,8 +20,10 @@ found pyenv && {
         }
 
         pyinstall() {
-            local vers=($(pyenv install -l | _sel_ver -m))
-            pyenv install "$@" ${vers[@]}
+            local ver
+            for ver in $(pyenv install -l | _sel_ver -m); do
+                pyenv install "$@" "$ver"
+            done
         }
     }
 }
