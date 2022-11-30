@@ -273,3 +273,6 @@ for mode in ('passthrough',):
 
 # allow JS clipboard access
 config.set('content.javascript.can_access_clipboard', True)
+
+# prefer dark mode
+config.set('colors.webpage.preferred_color_scheme', 'dark')
