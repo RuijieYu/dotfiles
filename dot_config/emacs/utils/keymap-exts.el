@@ -1,10 +1,13 @@
 ;;;###autoload
+(require 'cfg-util-backports "../utils/backports")
+
+;;;###autoload
 (defun define-remap (keymap &rest definitions)
   "Define remaps.  Each KEY and DEF should be acceptable by
  `define-key'.
 
 \(fn KEYMAP &rest [KEY DEFINITION]...)"
-  (declare (indent defun))
+  (declare (indent 1))
   ;; ref: `define-keymap'
   (unless (keymapp keymap)
     (error "Need a keymap"))
@@ -18,3 +21,7 @@
           (error "Duplicate definition for key: %S %s"
                  key keymap))
         (define-key keymap key def)))))
+
+;;;###autoload
+(progn (cfg-backport-version "29.0.60")
+       (require 'keymap "keymap"))

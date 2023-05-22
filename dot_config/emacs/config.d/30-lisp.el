@@ -36,8 +36,9 @@ function names.")
 
 ;;;###autoload
 (defun cfg-lisp-insert-operators (&optional key)
-  "Insert an operator name.  See `cfg-lisp-insert-allowed-operators’
-for the list of allowed operators."
+  "Insert an operator name.
+See `cfg-lisp-insert-allowed-operators’ for the list of allowed
+operators."
   (interactive)
   (lispy--remember)
   (let* ((key (or key (this-single-command-keys)))
@@ -164,6 +165,11 @@ otherwise insert \"lambda\" string."
 ;; lispy mode
 ;;;###autoload
 (use-package lispy
+  :straight
+  (lispy :fork
+         (:repo "RuijieYu/lispy"
+                ;; :branch "clisp-support-named-chars"
+                :branch "elisp-customizable-cl-indent-funcs"))
   :after lisp-mode
   :commands lispy-mode
   :custom
@@ -172,3 +178,149 @@ otherwise insert \"lambda\" string."
 ;;;###autoload
 (progn (add-hook 'lisp-mode-hook #'lispy-mode)
        (add-hook 'lisp-data-mode-hook #'lispy-mode))
+
+;;;###autoload
+(put '<- 'common-lisp-indent-function 0)
+
+;;;###autoload
+(put 'cl-defun 'common-lisp-indent-function 'defun)
+
+;;;###autoload
+(defun cfg-lisp-fill-list (&optional arg limit)
+  "Fill children.  If cursor is currently not at a list, an implicit
+`lispy-backward' is implied.  When prefixed with a single
+`universal-argument', fill recursively."
+  (interactive "P")
+  (unless (and (boundp 'lispy-mode) lispy-mode)
+    (user-error
+     "`cfg-lisp-fill-list' requires `lispy-mode'."))
+  (when (< fill-column 10)
+    (error "Value of `fill-column' too small: %s" fill-column))
+  (lispy-save-excursion
+    (cond ((lispy-right-p) (lispy-different))
+          ((not (lispy-left-p)) (lispy-backward)))
+    (with-buffer-unmodified-if-unchanged
+      (let ((recursive arg))
+        (cfg-lisp--fill-list :limit limit
+                             :recursive recursive)))))
+
+(defun cfg-lisp--col-of (&optional point)
+  (let ((point (or point (point))))
+    (save-excursion (goto-char point) (current-column))))
+
+(defun cfg-lisp--out-column-p (col)
+  (> col fill-column))
+
+(defun cfg-lisp--oobp (&optional point)
+  (let ((point (or point (point))))
+    (cfg-lisp--out-column-p (cfg-lisp--col-of point))))
+
+(cl-defun cfg-lisp--fill-list (&key limit recursive inner)
+  "Assuming at the beginning of a list sexp, fill it, without
+preserving cursor.  Return the highest end column of its child."
+  (let ((end-marker (copy-marker (cdr (lispy--bounds-dwim)) t)))
+    ;; go to beginning of car (fn name), then to the end of car
+    (forward-char) (forward-sexp)
+    ;; remove excess spaces if any
+    (just-one-space)
+    (cl-do ((count 0 (1+ count))
+            (col -1
+                 (cl-destructuring-bind (new-col . next-p)
+                     (cfg-lisp--fill-at-child
+                      end-marker
+                      :init (zerop count) :recursive recursive)
+                   (let ((col (max col new-col)))
+                     (when (or (and limit (>= count limit))
+                               (and inner
+                                    (cfg-lisp--out-column-p col))
+                               (not next-p))
+                       (cl-return col))
+                     col))))
+        (nil))))
+
+(cl-defun cfg-lisp--fill-at-child (end-marker &key init recursive)
+  "Try to fill the next child.  Return a `cons' cell whose `car' is
+the highest end column of the child, and whose `cdr' is whether
+more children should be filled."
+  (when indent-line-function (funcall indent-line-function))
+  (cl-flet* ((parent* ()
+               (save-excursion
+                 (cfg-lisp--fill-list :recursive recursive
+                                      :inner t)))
+             (skip-space (&optional backward newline)
+               (funcall (if backward #'skip-chars-backward
+                          #'skip-chars-forward)
+                        (if newline " \t\n" " \t")))
+             (parent ()
+               (if recursive
+                   (let ((first (parent*)))
+                     (if (cfg-lisp--out-column-p first)
+                         (progn (skip-space t)
+                                (newline-and-indent)
+                                (parent*))
+                       first))
+                 -1))
+             (skip-comment () (forward-comment (buffer-size)))
+             (cfg-lisp--col-of (point)
+               (save-excursion (goto-char point)
+                               (current-column)))
+             (next-line-only-comment-p ()
+               (save-excursion
+                 (forward-line 1)
+                 (< (point)
+                    (save-excursion (skip-comment)
+                                    (forward-line 0) (point))))))
+    (cl-destructuring-bind (left . right) (lispy--bounds-dwim)
+      (let ((last-child-p (>= (1+ right) end-marker))
+            (left (copy-marker left t))
+            (right (copy-marker right t))
+            (col -1))
+        (cl-flet
+            ((put-col (point)
+               (setq col (max col (cfg-lisp--col-of point)))))
+          (cond
+           ;; option (1): at cadr (arg 1); (2): at comment; (3):
+           ;; at newline
+           ((lispy--in-comment-p)
+            (fill-comment-paragraph) (skip-comment))
+           ((eql (char-after) ?\C-j)
+            (forward-line 1) (skip-space))
+           (t
+            ;; at beginning of child sexp
+            (let ((line-first-child-p
+                   (save-excursion
+                     (skip-space 'backward)
+                     (zerop (point)))))
+              ;; Work on current child
+              (cond
+               ;; if child is list-like, fill it
+               ((lispy-left-p) (put-col (parent)))
+               ;; no-op if first sexp of the line or parent
+               ((or init line-first-child-p)
+                (put-col (cdr (lispy--bounds-dwim))))
+               ;; otherwise, assume child is an atom.  (1): if
+               ;; left is out of bound, break line from the end of
+               ;; previous sexp; (2): if end of parent sexp, and
+               ;; end or closing paren out of bound, break line
+               ;; from the end of previous sexp
+               (t (when (or (cfg-lisp--oobp left)
+                            (cfg-lisp--oobp right)
+                            (and last-child-p
+                                 (cfg-lisp--oobp end-marker)))
+                    (skip-space 'backward)
+                    (put-col right)
+                    (newline-and-indent))))
+              ;; go to the next child
+              (if last-child-p nil
+                (forward-sexp)
+                (just-one-space
+                 (let ((next (save-excursion
+                               (skip-space) (char-after))))
+                   (cond
+                    ((and (eql next ?\C-j)
+                          (next-line-only-comment-p))
+                     0)
+                    ((eql next ?\C-j) -1)
+                    (t 1))))))))
+          (put-col right)
+          (cons col (not last-child-p)))))))

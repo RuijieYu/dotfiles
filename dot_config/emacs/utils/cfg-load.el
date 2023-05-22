@@ -47,20 +47,18 @@ Otherwise return nil."
 
 ;;;###autoload
 (defun cfg-load (el-file &optional relative no-compile)
-  "Compile and load a file EL-FILE from RELATIVE or
-`user-emacs-directory' if it exists.  The filename EL-FILE can be
-a bare name \"BASENAME\", or a file name with \"BASENAME.el\"
-pattern (implementation detail: or any other extension, just make
-sure \"BASENAME.el\" exists).  When NO-COMPILE is non-nil,
-disable compilation.
+  "Compile and load a file EL-FILE if it exists.
+EL-FILE is found from RELATIVE or `user-emacs-directory'.  The
+filename EL-FILE can be a bare name \"BASENAME\", or a file name
+with \"BASENAME.el\" pattern (implementation detail: or any other
+extension, just make sure \"BASENAME.el\" exists).  When
+NO-COMPILE is non-nil, disable compilation.
 
 Return the file name sans extension, if everything succeeds.
 Otherwise return nil."
   (unless (string= el-file null-device)
-    (let ((bare-file (cfg-compile
-                      el-file relative no-compile)))
-      (when bare-file
-        (load bare-file :noerror :nomessage)))))
+    (let ((bare-file (cfg-compile el-file relative no-compile)))
+      (and bare-file (load bare-file 'no-error)))))
 
 ;;;###autoload
 (defun cfg-load-recurse (dir &optional no-compile)

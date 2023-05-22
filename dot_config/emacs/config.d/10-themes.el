@@ -63,8 +63,9 @@
   (interactive)
   (modus-themes-with-colors
     (custom-set-faces
-     `(fill-column-indicator
-       ((,class :background ,(modus-themes-color 'fg-alt)))))))
+     ;; `(fill-column-indicator
+     ;;   ((,class :background ,(modus-themes-color 'fg-alt)))
+       )))
 
 ;;;###autoload
 (add-hook 'modus-themes-after-load-theme-hook

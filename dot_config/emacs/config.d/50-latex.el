@@ -23,7 +23,15 @@
   :straight nil
   :mode (rx ".tex" string-end)
   :hook
-  (latex-mode . cfg-latex-setup))
+  (latex-mode . cfg-latex-setup)
+  :config
+  (put 'dired-latex-unclean-extensions
+       'safe-local-variable
+       (lambda (val)
+         "Predicate for list of strings."
+         (and (listp val)
+              (cl-reduce (lambda (a v) (and a (stringp v))) val
+                         :initial-value t)))))
 
 ;;;###autoload
 (use-package auctex

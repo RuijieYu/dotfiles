@@ -12,7 +12,7 @@
 ;;;###autoload
 (defun cfg-python-setup ()
   (interactive)
-  (lsp-deferred)
+  ;; (lsp-deferred)
   (setq-local fill-column 80))
 
 ;;;###autoload
@@ -35,7 +35,7 @@
 (use-package lsp-pylsp
   :no-require t
   :straight lsp-mode
-  :after python
+  :after (python lsp)
   :custom
   (lsp-pylsp-server-command '("pylsp"))
   ;; completion system

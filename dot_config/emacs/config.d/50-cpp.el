@@ -7,8 +7,7 @@
 ;;;###autoload
 (defun cfg-cpp-setup ()
   (interactive)
-  (lsp-deferred)
-  (flyspell-prog-mode))
+  (lsp-deferred))
 
 ;;;###autoload
 (use-package cc-mode

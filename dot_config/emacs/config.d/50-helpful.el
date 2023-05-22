@@ -1,9 +1,16 @@
-;; -*- no-byte-compile: t; -*-
+;; -*- no-byte-compile: nil; -*-
+(eval-when-compile
+  (add-to-list
+   'load-path (expand-file-name "autoloads" user-emacs-directory))
+  (load "utils")
+  (preload '(helpful)))
+
+;;;###autoload
 (use-package helpful
   :disabled
   :after counsel
-  :bind
-  (([remap describe-function] . #'counsel-describe-function)
-   ([remap describe-variable] . #'counsel-describe-variable)))
-
-()
+  :commands (helpful-command
+             helpful-key)
+  :init
+  (global-set-key [remap describe-command] #'helpful-command)
+  (global-set-key [remap describe-key] #'helpful-key))

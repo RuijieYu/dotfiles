@@ -65,8 +65,8 @@ tangled."
   (org-confirm-babel-evaluate nil)
 
   ;; startup
-  (org-startup-indented nil)            ; org-indent-mode
-  (org-startup-numerated nil)           ; org-num-mode
+  (org-startup-indented t)              ; org-indent-mode
+  (org-startup-numerated t)             ; org-num-mode
   (org-startup-folded t) ; there are more options, I just want to fold everything
 
   ;; visuals
@@ -81,12 +81,11 @@ tangled."
   (org-image-actual-width 500)
 
   ;; miscellaneous configurations
-  (org-cycle-separator-lines 2))
+  (org-cycle-separator-lines 2)
 
-;;;###autoload
-(with-eval-after-load 'org
-  (let ((bullet #'(compose-region
-                   (match-beginning 1) (match-end 1) "•")))
+  :config
+  (let ((bullet
+         '(compose-region (match-beginning 1) (match-end 1) "•")))
     (font-lock-add-keywords
      'org-mode `(;; MINUS at beginning, followed by WS
                  (,(rx line-start
@@ -100,6 +99,12 @@ tangled."
   (define-keymap :keymap org-mode-map
     "C-<tab> l" #'org-agenda-list))
 
+;;;###autoload
+(use-package ol
+  :straight org
+  :custom
+  (org-link-file-path-type 'relative))
+
 ;;* org-src
 ;;;###autoload
 (use-package org-src
@@ -110,10 +115,8 @@ tangled."
   :custom
   (org-src-preserve-indentation t)
   (org-src-tab-acts-natively t)
-  (org-src-fontify-natively t))
-
-;;;###autoload
-(with-eval-after-load 'org-src
+  (org-src-fontify-natively t)
+  :config
   (define-keymap :keymap org-src-mode-map
     "C-c C-v t" #'cfg--org-src-tangle))
 

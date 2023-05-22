@@ -23,6 +23,7 @@ original keymap under \"s-l\" no longer works in sway.")
 
 ;;;###autoload
 (use-package lsp-mode
+  :disabled
   :after xref
   :commands (lsp
              lsp-deferred
@@ -57,6 +58,18 @@ original keymap under \"s-l\" no longer works in sway.")
   "= -" #'lsp-format-region)
 
 ;;;###autoload
-(define-keymap :keymap (current-global-map)
-  "C-c l l" #'lsp
-  "s-l s-l" #'lsp)
+(unless t
+  (define-keymap :keymap (current-global-map)
+    "C-c l l" #'lsp
+    "s-l s-l" #'lsp))
+
+;;;###autoload
+(use-package eglot
+  :straight nil
+  :functions eglot)
+
+;;;###autoload
+(defalias 'lsp #'eglot)
+
+;;;###autoload
+(defalias 'lsp-deferred #'eglot-ensure)

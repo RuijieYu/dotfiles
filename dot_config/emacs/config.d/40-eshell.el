@@ -35,6 +35,7 @@ verbatim."
 
 ;;;###autoload
 (defun cfg-eshell-init-setup ()
+  "The hook function for first-time `eshell' initialization."
   (interactive)
   (push #'eshell-truncate-buffer
         eshell-output-filter-functions)
@@ -44,8 +45,10 @@ verbatim."
 
 ;;;###autoload
 (defun cfg-eshell-setup ()
+  "The hook function run after creating a `eshell-mode' buffer."
   (interactive)
   (display-line-numbers-mode -1)
+  (display-fill-column-indicator-mode -1)
   (eshell-syntax-highlighting-mode))
 
 ;;;###autoload

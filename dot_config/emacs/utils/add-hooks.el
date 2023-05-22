@@ -1,4 +1,3 @@
-;;;###autoload
 (require 'cl-macs)
 
 ;;;###autoload

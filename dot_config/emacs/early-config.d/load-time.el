@@ -1,11 +1,10 @@
 ;;;###autoload
 (defun cfg-show-load-time ()
-  (message "** Emacs loaded in %s with %d GCs."
-           (format "%.2fs"
-                   (float-time
-                    (time-subtract
-                     after-init-time
-                     before-init-time)))
+  (message "** Emacs loaded in %.2fs with %d GCs."
+           (float-time
+            (time-subtract
+             after-init-time
+             before-init-time))
            gc-elapsed))
 
 ;;;###autoload

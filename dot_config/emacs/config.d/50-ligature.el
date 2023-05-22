@@ -44,8 +44,7 @@
 (use-package ligature
   ;; ligature has issues in emacs <28
   :if (version<= "28" emacs-version)
-  :hook
-  (after-init . global-ligature-mode)
+  :disabled
   :config
   ;; clear up ligature table
   (defvar ligature-composition-table)

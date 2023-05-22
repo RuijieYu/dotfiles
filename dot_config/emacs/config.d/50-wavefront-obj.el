@@ -7,4 +7,5 @@
 
 ;;;###autoload
 (use-package wavefront-obj-mode
+  :disabled
   :mode (rx ".obj" string-end))

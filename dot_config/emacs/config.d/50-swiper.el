@@ -7,8 +7,8 @@
 
 ;;;###autoload
 (use-package swiper
-  :commands swiper)
-
-;;;###autoload
-(define-remap (current-global-map)
-  [remap isearch-forward] #'swiper)
+  :after vertico
+  :commands swiper
+  :init
+  (define-remap (current-global-map)
+    [remap isearch-forward] #'swiper))

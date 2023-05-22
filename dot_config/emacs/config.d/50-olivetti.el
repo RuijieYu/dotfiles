@@ -9,8 +9,6 @@
 ;;;###autoload
 (use-package olivetti
   :commands olivetti-mode
-  :hook
-  (org-mode . olivetti-mode)
   :config
   (define-keymap :keymap olivetti-mode-map
     "C-c" nil

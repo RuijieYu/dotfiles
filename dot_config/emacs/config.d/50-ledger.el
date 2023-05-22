@@ -20,4 +20,6 @@
   (ledger-mode . cfg-ledger-setup)
   :custom
   (ledger-report-use-header-line t)
-  (ledger-report-use-strict t))
+  (ledger-report-use-strict t)
+  (ledger-master-file "~/finance/finance.ledger")
+  (ledger-accounts-file "~/finance/accounts.ledger"))

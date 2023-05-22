@@ -49,21 +49,30 @@ orgmode file paths."
   (append (cfg-org-agenda-find 3 "~/academia")
           (cfg-org-agenda-find 0 "~/org/agenda")))
 
+;;;###autoload
+(defun cfg-org-agenda-after-scale-hook ()
+  "Hook to run inside `org-agenda-mode' after rescaling."
+  (let ((saved-event last-command-event))
+    (when (derived-mode-p 'org-agenda-mode)
+      (org-agenda-redo-all))
+    (setq last-command-event saved-event)))
+
 ;; This way I can add all my course-specific org-agenda files as
 ;; ~/academia/SCHOOL/TERM/COURSE/*.org, while still having orgmode
 ;; files (like notes) elsewehere further inside COURSE
 ;; directories.
 ;;;###autoload
 (use-package org-agenda
-  :no-require t
-  :straight org
-  :after org
-  :custom
-  (org-agenda-breadcrumbs-separator "→")
-  (org-agenda-span 'fortnight)
-  (org-agenda-skip-deadline-prewarning-if-scheduled t)
-  (org-agenda-files
-   (cl-remove-if-not
-    #'file-exists-p
-    (mapcar #'expand-file-name
-            (cfg-org-agenda-collect)))))
+    :no-require t
+    :straight org
+    :after org
+    :hook (text-scale-mode . cfg-org-agenda-after-scale-hook)
+    :custom
+    (org-agenda-breadcrumbs-separator "→")
+    (org-agenda-span 'fortnight)
+    (org-agenda-skip-deadline-prewarning-if-scheduled t)
+    (org-agenda-files
+     (cl-remove-if-not
+      #'file-exists-p
+      (mapcar #'expand-file-name
+              (cfg-org-agenda-collect)))))

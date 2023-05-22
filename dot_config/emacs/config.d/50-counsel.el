@@ -2,16 +2,22 @@
 (eval-when-compile
   (add-to-list
    'load-path (expand-file-name "autoloads" user-emacs-directory))
-  (load "utils"))
+  (load "utils")
+  (preload '(counsel)))
 
+;;;###autoload
 (use-package counsel
   :disabled
   :commands (counsel-describe-function
-             counsel-describe-variable)
-  :bind
-  (([remap describe-command] . #'helpful-command)
-   ([remap describe-key] . #'helpful-key))
+             counsel-describe-variable
+             counsel-load-theme)
+  :init
+  (global-set-key [remap describe-function]
+                  #'counsel-describe-function)
+  (global-set-key [remap describe-variable]
+                  #'counsel-describe-variable)
   :config
-  (defalias 'counsel-load-theme #'load-theme)
-  (global-set-key
-   [C-tab ?t ?t] #'counsel-load-theme))
+  (advice-add #'load-theme :override #'counsel-load-theme))
+
+;;;###autoload
+(global-set-key [C-tab ?t ?t] #'load-theme)
